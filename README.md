@@ -13,20 +13,25 @@ Ontologies used
 * [Cell Line Ontology (CLO)]
 * [Human Disease Ontology (DOID)]
 
+Ontology files to use:
+----------------
+
+* Uberon and CL: composite-metazoan.owl from [Uberon download]
+* EFO: EFO_inferred.owl from [EFO src tree]
+* OBI: obi.owl [OBI download]
+* CLO: clo.owl [CLO download]
+* DOID: doid.owl [DOID download]
+
 How to update the ontology versions
 ----------------
 
-1. Ontology files to use:
+1. Install ontology script:
 
-    * Uberon and CL: composite-metazoan.owl from [Uberon download]
-    * EFO: EFO_inferred.owl from [EFO src tree]
-    * OBI: obi.owl [OBI download]
-    * CLO: clo.owl [CLO download]
-    * DOID: doid.owl [DOID download]
+    `pip install .`
 
-2. Run generate-ontology:
+2. Run generate_ontology:
 
-    `generate-ontology`
+    `generate_ontology`
 
 3. The ontology file generated has a file name format like this: ontology.json       ontology-YYYY-MM-DD.json
 
