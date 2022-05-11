@@ -1,7 +1,7 @@
 Updating ontologies
 =========================
 
-This document describes how to update the ontology versions used for searching and validation in the encoded application, ```ontology.json``` .
+This document describes how to update the ontology versions used for searching and validation in the igvf application, ```ontology.json``` .
 
 Ontology files to use
 ----------------
@@ -26,7 +26,7 @@ How to update the ontology versions
 
     `generate_ontology`
 
-3. The ontology file generated has a file name format like this: ontology.json       ontology-YYYY-MM-DD.json
+3. The ontology file generated has a file name format like this:       ontology-YYYY-MM-DD.json
 
 4. Load new ontology file into the encoded-build/ontology directory on S3
 
@@ -40,28 +40,56 @@ How to update the ontology versions
 
 6. Update the following information
 
-    Site release version: N/A
-    ontology.json file: N/A
-    [UBERON release date]: 2021-10-01
-    [OBI release date]: 2022-01-03
-    [EFO release date]: 2022-01-17
-    [CLO release date]: 2019-02-10
-    [DOID release date]: 2021-12-15
+    * Site release version: N/A
 
-    [Uber anatomy ontology (Uberon)]: http://uberon.org/
-    [Cell Ontology (CL)]: http://cellontology.org/
-    [Experimental Factor Ontology (EFO)]: http://www.ebi.ac.uk/efo
-    [Ontology for Biomedical Investigations (OBI)]: http://obi-ontology.org/
-    [Cell Line Ontology (CLO)]: http://www.clo-ontology.org
-    [Human Disease Ontology (DOID)]: http://www.disease-ontology.org
-    [Uberon download]: https://github.com/obophenotype/uberon/releases
-    [EFO src tree]: https://github.com/EBISPOT/efo/
-    [OBI download]: http://www.ontobee.org/ontology/OBI
-    [CLO download]: http://www.ontobee.org/ontology/CLO
-    [DOID download]: http://www.ontobee.org/ontology/DOID
-    [Makefile]: ../../../Makefile
-    [UBERON release date]: https://github.com/obophenotype/uberon/releases
-    [OBI release date]: https://github.com/obi-ontology/obi/releases
-    [EFO release date]: https://github.com/EBISPOT/efo/blob/master/ExFactor%20Ontology%20release%20notes.txt
-    [CLO release date]: http://www.ontobee.org/ontology/CLO
-    [DOID release date]: http://www.ontobee.org/ontology/DOID
+    * ontology.json file: N/A
+
+    * UBERON release date: 2022-04-18
+
+    * OBI release date: 2022-01-03
+
+    * EFO release date: 2022-04-19
+
+    * CLO release date: 2022-03-20
+
+    * DOID release date: 2022-04-28
+
+    * HP release date: 2022-04-14
+
+    * MONDO release date: 2022-05-02
+
+    * OBA release date: 2022-05-06
+
+7. Resources
+
+    * [Uber anatomy ontology (Uberon)](http://uberon.org/)
+
+    * [Cell Ontology (CL)](http://cellontology.org/)
+
+    * [Experimental Factor Ontology (EFO)](http://www.ebi.ac.uk/efo)
+
+    * [Ontology for Biomedical Investigations (OBI)](http://obi-ontology.org/)
+
+    * [Cell Line Ontology (CLO)](http://www.clo-ontology.org)
+
+    * [Human Disease Ontology (DOID)](http://www.disease-ontology.org)
+
+    * [Uberon download](https://github.com/obophenotype/uberon/releases)
+
+    * [EFO src tree](https://github.com/EBISPOT/efo/)
+
+    * [OBI download](http://www.ontobee.org/ontology/OBI)
+
+    * [CLO download](http://www.ontobee.org/ontology/CLO)
+
+    * [DOID download](http://www.ontobee.org/ontology/DOID)
+
+    * [UBERON release date](https://github.com/obophenotype/uberon/releases)
+
+    * [OBI release date](https://github.com/obi-ontology/obi/releases)
+
+    * [EFO release date](https://github.com/EBISPOT/efo/blob/master/ExFactor%20Ontology%20release%20notes.txt)
+
+    * [CLO release date](http://www.ontobee.org/ontology/CLO)
+
+    * [DOID release date](http://www.ontobee.org/ontology/DOID)
