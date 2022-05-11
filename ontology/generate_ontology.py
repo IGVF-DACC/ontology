@@ -29,19 +29,23 @@ ACHIEVES_PLANNED_OBJECTIVE = OBO['OBI_0000417']
 ONTOLOGY_ASSET_DICT = {
     'uberon': {
         'ontology_repo': 'obophenotype/uberon',
-        'asset_name': 'composite-metazoan.owl'
+        'asset_name': 'composite-metazoan.owl',
+        'uri': 'http://purl.obolibrary.org/obo/uberon.owl'
     },
     'efo': {
         'ontology_repo': 'EBISPOT/efo',
-        'asset_name': 'efo.owl'
+        'asset_name': 'efo.owl',
+        'uri': 'http://www.ebi.ac.uk/efo/efo.owl'
     },
     'mondo': {
         'ontology_repo': 'monarch-initiative/mondo',
-        'asset_name': 'mondo.owl'
+        'asset_name': 'mondo.owl',
+        'uri': 'http://purl.obolibrary.org/obo/mondo.owl'
     },
     'oba': {
         'ontology_repo': 'obophenotype/bio-attribute-ontology',
-        'asset_name': 'oba.owl'
+        'asset_name': 'oba.owl',
+        'uri': 'http://purl.obolibrary.org/obo/oba.owl'
     },
     'obi': {
         'ontology_repo': 'obi-ontology/obi',
@@ -243,28 +247,27 @@ def get_downLoad_url(owl_file_name):
     asset_name = ONTOLOGY_ASSET_DICT[owl_file_name]['asset_name']
     ontology_url = 'https://api.github.com/repos/' + ontology_repo + '/releases/latest'
     download_url = None
+    data = None
     headers = CaseInsensitiveDict()
     headers['Accept'] = 'application/vnd.github.v3+json'
     response = requests.get(ontology_url, headers=headers)
-    if response.status_code != 200:
-        download_url = 'http://purl.obolibrary.org/obo/' + owl_file_name + '.owl'
-        print(asset_name + ':', download_url)
-        print(asset_name, 'release info not available \n')
-        return download_url
-    data = response.json()
-    assets = data['assets']
-
-    if assets:
-        for asset in assets:
-            if asset['name'] == asset_name:
-                download_url = asset['browser_download_url']
-                break
+    if response.status_code == 200:    
+        data = response.json()
+        assets = data['assets']
+        if assets:
+            for asset in assets:
+                if asset['name'] == asset_name:
+                    download_url = asset['browser_download_url']
+                    break
     if not download_url:
-        download_url = 'http://purl.obolibrary.org/obo/' + owl_file_name + '.owl'
+        download_url = ONTOLOGY_ASSET_DICT[owl_file_name]['uri']
 
     print(asset_name + ':', download_url)
-    print('release name: ' + data['name'])
-    print('release tag: ' + data['tag_name'] + '\n')
+    if data:
+        print('release name: ' + data['name'])
+        print('release tag: ' + data['tag_name'] + '\n')
+    else:
+        print('release info: not available \n')
 
     return download_url
 
