@@ -40,7 +40,7 @@ ONTOLOGY_ASSET_DICT = {
         'asset_name': 'mondo.owl'
     },
     'oba': {
-        'ontology_repo': 'obo/oba',
+        'ontology_repo': 'obophenotype/bio-attribute-ontology',
         'asset_name': 'oba.owl'
     },
     'obi': {
@@ -57,6 +57,11 @@ ONTOLOGY_ASSET_DICT = {
         'ontology_repo': 'DiseaseOntology/HumanDiseaseOntology',
         'asset_name': 'doid.owl',
         'uri': 'http://purl.obolibrary.org/obo/doid.owl'
+    },
+    'hp': {
+        'ontology_repo': 'obophenotype/human-phenotype-ontology',
+        'asset_name': 'hp.owl',
+        'uri': 'http://purl.obolibrary.org/obo/hp.owl'
     }
 }
 
@@ -254,7 +259,7 @@ def get_downLoad_url(owl_file_name):
             if asset['name'] == asset_name:
                 download_url = asset['browser_download_url']
                 break
-    else:
+    if not download_url:
         download_url = 'http://purl.obolibrary.org/obo/' + owl_file_name + '.owl'
 
     print(asset_name + ':', download_url)
@@ -275,8 +280,14 @@ def main():
     clo_url = get_downLoad_url('clo')
     # Human Disease Ontology for disease
     doid_url = get_downLoad_url('doid')
+    # The Human Phenotype Ontology (HPO) for disease
+    hp_url = get_downLoad_url('hp')
+    # Mondo Disease Ontology for disease
+    mondo_url = get_downLoad_url('mondo')
+    # Ontology of Biological Attributes covering all kingdoms of life
+    oba_url = get_downLoad_url('oba')
 
-    whitelist = [uberon_url, efo_url, obi_url, doid_url]
+    whitelist = [uberon_url, efo_url, obi_url, doid_url, hp_url, mondo_url, oba_url]
     
     print("Generating ontology file...")
     terms = {}
