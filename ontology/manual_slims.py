@@ -1,4 +1,4 @@
-slim_shims = {
+manual_slims = {
     # this allows us to manually assign term X to slim Y while waiting for ontology updates
     'assay': {
         # DNA accessibility
@@ -41,7 +41,7 @@ slim_shims = {
         'OBI:0002631': ['Single cell', 'Transcription'],  # scRNA-seq,
         'OBI:0002038': ['Ribosome activity'], # Ribo-seq
     },
-    'cell': {
+    'cells': {
         'CL:0000038': ['hematopoietic cell', 'myeloid cell', 'progenitor cell'], # 'hematopoietic cell' & 'myeloid cell' are ontology-based
         'CL:0000049': ['hematopoietic cell', 'progenitor cell'], # 'hematopoietic cell' is ontology-based
         'CL:0000050': ['hematopoietic cell', 'myeloid cell', 'progenitor cell'], # 'hematopoietic cell' & 'myeloid cell' are ontology-based
@@ -255,7 +255,7 @@ slim_shims = {
         'UBERON:8300003': ['mesoderm'],
         'UBERON:8300004': ['mesoderm']
     },
-    'organ': {
+    'organs': {
         'CL:0000037': ['blood', 'bodily fluid'],
         'CL:0000081': ['blood', 'bodily fluid'],
         'CL:0000084': ['blood', 'bodily fluid'],
@@ -366,7 +366,7 @@ slim_shims = {
         'UBERON:8300003': ['bone element', 'skeleton', 'limb'], # 'limb' is ontology-based
         'UBERON:8300004': ['bone element', 'skeleton', 'limb'] # 'limb' is ontology-based
     },
-    'system': {
+    'systems': {
         'CL:0000103': ['central nervous system'],
         'CL:0011020': ['central nervous system'],
         'CL:0008030': ['central nervous system', 'peripheral nervous system'],
