@@ -285,18 +285,25 @@ def main():
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
+                                            if str(data.rdf_graph.label(collection[0])):
+                                                terms[term_id]['name'] = str(data.rdf_graph.label(collection[0]))
+                                            if PREFERRED_NAME.get(term_id):
+                                                terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
                                         terms[term_id]['part_of'] = terms[term_id].get('part_of', []) + [getTermId(subC)]
                                 elif DEVELOPS_FROM in col_list:
                                     for subC in data.rdf_graph.objects(c, RDFS.subClassOf):
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
+                                            if str(data.rdf_graph.label(collection[0])):
+                                                terms[term_id]['name'] = str(data.rdf_graph.label(collection[0]))
+                                            if PREFERRED_NAME.get(term_id):
+                                                terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
                                         terms[term_id]['develops_from'] = terms[term_id].get('develops_from', []) + [getTermId(subC)]
             else:
                 term_id = getTermId(c)
                 if term_id not in terms:
                     terms[term_id] = {}
-                terms[term_id]['id'] = term_id
                 if str(data.rdf_graph.label(c)):
                     terms[term_id]['name'] = str(data.rdf_graph.label(c))
                 if PREFERRED_NAME.get(term_id):
@@ -356,6 +363,8 @@ def main():
                 terms[term_id] = {}
                 if str(data.rdf_graph.label(c)):
                     terms[term_id]['name'] = str(data.rdf_graph.label(c))
+                if PREFERRED_NAME.get(term_id):
+                    terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
             synonyms = data.getSynonyms(c)
             if synonyms:
                 terms[term_id]['synonyms'] = terms[term_id].get('synonyms', []) + synonyms
@@ -382,10 +391,19 @@ def main():
             terms[term]['developmental'] = developmental
 
     for term in terms:
-        keys_to_remove = ['closure', 'closure_with_develops_from', 'parents', 'develops_from', 'has_part', 'achieves_planned_objective', 
-            'id', 'data', 'data_with_develops_from', 'part_of', 'derives_from']
+        keys_to_remove = ['closure', 'parents', 'develops_from', 'has_part', 'achieves_planned_objective', 
+            'data', 'data_with_develops_from', 'part_of', 'derives_from']
         for key in keys_to_remove:
             terms[term].pop(key, None)
+
+        ancestors = []
+        for term_id in terms[term]['closure_with_develops_from']:
+            term_label = terms[term_id].get('name', '')
+            if term_label:
+                ancestors.append(term_label)
+        if ancestors:
+            terms[term]['ancestors'] = ancestors
+        terms[term].pop('closure_with_develops_from', None)
 
     terms.update(ntr_assays)
     terms.update(ntr_biosamples)
