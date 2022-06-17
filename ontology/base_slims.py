@@ -4,7 +4,7 @@ base_slims = {
         'UBERON:0000924': 'ectoderm',
         'UBERON:0000925': 'endoderm'
     },
-    'system': {
+    'systems': {
         'UBERON:0001015': 'musculature',
         'UBERON:0000949': 'endocrine system',
         'UBERON:0002330': 'exocrine system',
@@ -21,7 +21,7 @@ base_slims = {
         'UBERON:0000010': 'peripheral nervous system'
     },
 
-    'organ': {
+    'organs': {
         'UBERON:0002369': 'adrenal gland',
         'UBERON:0002110': 'gallbladder',
         'UBERON:0002106': 'spleen',
@@ -104,7 +104,7 @@ base_slims = {
         'UBERON:0001471': 'skin of prepuce of penis'
     },
 
-    'cell': {
+    'cells': {
         'CL:0000236': 'B cell',
         'EFO:0001640': 'B cell',  # B cell derived cell line
         'EFO:0001639': 'cancer cell',  # cancer cell line
@@ -168,7 +168,7 @@ base_slims = {
         'OBI:0001854': 'protein and RNA interaction'
     },
 
-    'objective': {
+    'objectives': {
         'OBI:0000218': 'cellular feature identification objective',
         'OBI:0001691': 'cellular structure feature identification objective',
         'OBI:0001916': 'DNA replication identification objective',
@@ -182,7 +182,7 @@ base_slims = {
         'OBI:0001854': 'protein and RNA interaction identification objective'
     },
 
-    'type': {
+    'types': {
         'OBI:0001700': 'immunoprecipitation assay',
         'OBI:0000424': 'transcription profiling assay',
         'OBI:0000634': 'DNA methylation profiling assay',

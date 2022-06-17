@@ -10,7 +10,7 @@ from ontology.ntr_terms import (
     ntr_assays,
     ntr_biosamples
 )
-from ontology.manual_slims import slim_shims
+from ontology.manual_slims import manual_slims
 from ontology.base_slims import base_slims
 
 
@@ -208,39 +208,12 @@ def getBaseSlims(term, slimType, slim_candidates):
     for slimTerm_key in slimTerms:
         if slimTerm_key in slim_candidates:
             base_slim_names.append(slimTerms[slimTerm_key])
-    if slimType in slim_shims:
+    if slimType in manual_slims:
         # Overrides all Ontology based-slims
-        shims_override = slim_shims[slimType].get(term, [])
+        shims_override = manual_slims[slimType].get(term, [])
         if shims_override:
             return shims_override
     return base_slim_names
-
-
-def getTermStructure():
-    return {
-        'id': '',
-        'name': '',
-        'preferred_name': '',
-        'parents': [],
-        'part_of': [],
-        'has_part': [],
-        'derives_from': [],
-        'develops_from': [],
-        'achieves_planned_objective': [],
-        'organs': [],
-        'cells': [],
-        'closure': [],
-        'slims': [],
-        'data': [],
-        'closure_with_develops_from': [],
-        'data_with_develops_from': [],
-        'synonyms': [],
-        'category': [],
-        'assay': [],
-        'types': [],
-        'objectives': []
-    }
-
 
 def get_downLoad_url(owl_file_name):
     ontology_repo = ONTOLOGY_ASSET_DICT[owl_file_name]['ontology_repo']
@@ -311,21 +284,23 @@ def main():
                                     for subC in data.rdf_graph.objects(c, RDFS.subClassOf):
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
-                                            terms[term_id] = getTermStructure()
-                                        terms[term_id]['part_of'].append(getTermId(subC))
+                                            terms[term_id] = {}
+                                        terms[term_id]['part_of'] = terms[term_id].get('part_of', []) + [getTermId(subC)]
                                 elif DEVELOPS_FROM in col_list:
                                     for subC in data.rdf_graph.objects(c, RDFS.subClassOf):
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
-                                            terms[term_id] = getTermStructure()
-                                        terms[term_id]['develops_from'].append(getTermId(subC))
+                                            terms[term_id] = {}
+                                        terms[term_id]['develops_from'] = terms[term_id].get('develops_from', []) + [getTermId(subC)]
             else:
                 term_id = getTermId(c)
                 if term_id not in terms:
-                    terms[term_id] = getTermStructure()
+                    terms[term_id] = {}
                 terms[term_id]['id'] = term_id
-                terms[term_id]['name'] = str(data.rdf_graph.label(c))
-                terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id, '')
+                if str(data.rdf_graph.label(c)):
+                    terms[term_id]['name'] = str(data.rdf_graph.label(c))
+                if PREFERRED_NAME.get(term_id):
+                    terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
                 # Get all parents
                 for parent in data.get_classDirectSupers(c, excludeBnodes=False):
                     if type(parent) == BNode:
@@ -333,49 +308,44 @@ def main():
                             if o == PART_OF:
                                 for o1 in data.rdf_graph.objects(parent, OWL.someValuesFrom):
                                     if type(o1) != BNode:
-                                        terms[term_id]['part_of'].append(getTermId(o1))
+                                        terms[term_id]['part_of'] = terms[term_id].get('part_of', []) + [getTermId(o1)]
                             elif o == DEVELOPS_FROM:
                                 for o1 in data.rdf_graph.objects(parent, OWL.someValuesFrom):
                                     if type(o1) != BNode:
-                                        terms[term_id]['develops_from'].append(
-                                            getTermId(o1))
+                                        terms[term_id]['develops_from'] = terms[term_id].get('develops_from', []) + [getTermId(o1)]
                             elif o == HAS_PART:
                                 for o1 in data.rdf_graph.objects(parent, OWL.someValuesFrom):
                                     if type(o1) != BNode:
-                                        terms[term_id]['has_part'].append(
-                                            getTermId(o1))
+                                        terms[term_id]['has_part'] = terms[term_id].get('has_part', []) + [getTermId(o1)]
                             elif o == DERIVES_FROM:
                                 for o1 in data.rdf_graph.objects(parent, OWL.someValuesFrom):
                                     if type(o1) != BNode:
-                                        terms[term_id]['derives_from'].append(
-                                            getTermId(o1))
+                                        terms[term_id]['derives_from'] = terms[term_id].get('derives_from', []) + [getTermId(o1)]
                                     else:
                                         for o2 in data.rdf_graph.objects(o1, OWL.intersectionOf):
                                             for o3 in data.rdf_graph.objects(o2, RDF.first):
                                                 if type(o3) != BNode:
-                                                    terms[term_id]['derives_from'].append(
-                                                        getTermId(o3))
+                                                    terms[term_id]['derives_from'] = terms[term_id].get('derives_from', []) + [getTermId(o3)]
                                             for o3 in data.rdf_graph.objects(o2, RDF.rest):
                                                 for o4 in data.rdf_graph.objects(o3, RDF.first):
                                                     for o5 in data.rdf_graph.objects(o4, OWL.someValuesFrom):
                                                         for o6 in data.rdf_graph.objects(o5, OWL.intersectionOf):
                                                             for o7 in data.rdf_graph.objects(o6, RDF.first):
                                                                 if type(o7) != BNode:
-                                                                    terms[term_id]['derives_from'].append(
-                                                                        getTermId(o7))
+                                                                    terms[term_id]['derives_from'] = terms[term_id].get('derives_from', []) + [getTermId(o7)]
                                                                     for o8 in data.rdf_graph.objects(o6, RDF.rest):
                                                                         for o9 in data.rdf_graph.objects(o8, RDF.first):
                                                                             if type(o9) != BNode:
-                                                                                terms[term_id]['derives_from'].append(
-                                                                                    getTermId(o9))
+                                                                                terms[term_id]['derives_from'] = terms[term_id].get('derives_from', []) + [getTermId(o9)]
                             elif o == ACHIEVES_PLANNED_OBJECTIVE:
                                 for o1 in data.rdf_graph.objects(parent, OWL.someValuesFrom):
                                     if type(o1) != BNode:
-                                        terms[term_id]['achieves_planned_objective'].append(
-                                            getTermId(o1))
+                                        terms[term_id]['achieves_planned_objective'] = terms[term_id].get('achieves_planned_objective', []) + [getTermId(o1)]
                     else:
-                        terms[term_id]['parents'].append(getTermId(parent))
-                terms[term_id]['synonyms'] = terms[term_id]['synonyms'] + data.getSynonyms(c)
+                        terms[term_id]['parents'] = terms[term_id].get('parents', []) + [getTermId(parent)]
+                synonyms = data.getSynonyms(c)
+                if synonyms:
+                    terms[term_id]['synonyms'] = terms[term_id].get('synonyms', []) + synonyms
 
     # Get only CLO terms from the CLO owl file
     data = Inspector(clo_url)
@@ -383,14 +353,17 @@ def main():
         if c.startswith('http://purl.obolibrary.org/obo/CLO'):
             term_id = getTermId(c)
             if term_id not in terms:
-                terms[term_id] = getTermStructure()
-                terms[term_id]['name'] = str(data.rdf_graph.label(c))
-            terms[term_id]['synonyms'] = terms[term_id]['synonyms'] + data.getSynonyms(c)
+                terms[term_id] = {}
+                if str(data.rdf_graph.label(c)):
+                    terms[term_id]['name'] = str(data.rdf_graph.label(c))
+            synonyms = data.getSynonyms(c)
+            if synonyms:
+                terms[term_id]['synonyms'] = terms[term_id].get('synonyms', []) + synonyms
 
     for term in terms:
-        terms[term]['data'] = list(set(terms[term]['parents']) | set(terms[term]['part_of']) | set(
-            terms[term]['derives_from']) | set(terms[term]['achieves_planned_objective']))
-        terms[term]['data_with_develops_from'] = list(set(terms[term]['data']) | set(terms[term]['develops_from']))
+        terms[term]['data'] = list(set(terms[term].get('parents', [])) | set(terms[term].get('  ', [])) | set(
+            terms[term].get('derives_from', [])) | set(terms[term].get('achieves_planned_objective', [])))
+        terms[term]['data_with_develops_from'] = list(set(terms[term].get('data', [])) | set(terms[term].get('develops_from', [])))
     for term in terms:
         terms[term]['closure'] = getAncestors(terms[term]['data'], terms, 'data')
         terms[term]['closure_with_develops_from'] = getAncestors(
@@ -398,20 +371,21 @@ def main():
         terms[term]['closure'].append(term)
         terms[term]['closure_with_develops_from'].append(term)
 
-        terms[term]['systems'] = getBaseSlims(term, 'system', terms[term]['closure'])
-        terms[term]['organs'] = getBaseSlims(term, 'organ', terms[term]['closure'])
-        terms[term]['cells'] = getBaseSlims(term, 'cell', terms[term]['closure'])
-        terms[term]['developmental'] = getBaseSlims(term, 'developmental', terms[term]['closure_with_develops_from'])
-        terms[term]['assay'] = getBaseSlims(term, 'assay', terms[term]['closure'])
-        terms[term]['category'] = getBaseSlims(term, 'category', terms[term]['closure'])
-        terms[term]['objectives'] = getBaseSlims(term, 'objective', terms[term]['closure'])
-        terms[term]['types'] = getBaseSlims(term, 'type', terms[term]['closure'])
+        keys = ['systems', 'organs', 'cells', 'assay', 'category', 'objectives', 'types']
+        for key in keys:
+            value = getBaseSlims(term, key, terms[term]['closure'])
+            if value:
+                terms[term][key] = value
+        
+        developmental = getBaseSlims(term, 'developmental', terms[term]['closure_with_develops_from'])
+        if developmental:
+            terms[term]['developmental'] = developmental
 
     for term in terms:
-        del terms[term]['closure'], terms[term]['closure_with_develops_from']
-        del terms[term]['parents'], terms[term]['develops_from']
-        del terms[term]['has_part'], terms[term]['achieves_planned_objective']
-        del terms[term]['id'], terms[term]['data'], terms[term]['data_with_develops_from']
+        keys_to_remove = ['closure', 'closure_with_develops_from', 'parents', 'develops_from', 'has_part', 'achieves_planned_objective', 
+            'id', 'data', 'data_with_develops_from', 'part_of', 'derives_from']
+        for key in keys_to_remove:
+            terms[term].pop(key, None)
 
     terms.update(ntr_assays)
     terms.update(ntr_biosamples)
