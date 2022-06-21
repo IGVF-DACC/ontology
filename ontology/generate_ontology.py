@@ -361,7 +361,7 @@ def main():
                 terms[term_id]['synonyms'] = terms[term_id].get('synonyms', []) + synonyms
 
     for term in terms:
-        terms[term]['data'] = list(set(terms[term].get('parents', [])) | set(terms[term].get('  ', [])) | set(
+        terms[term]['data'] = list(set(terms[term].get('parents', [])) | set(terms[term].get('part_of', [])) | set(
             terms[term].get('derives_from', [])) | set(terms[term].get('achieves_planned_objective', [])))
         terms[term]['data_with_develops_from'] = list(set(terms[term].get('data', [])) | set(terms[term].get('develops_from', [])))
     for term in terms:
