@@ -165,7 +165,7 @@ class Inspector(object):
         # OBO synonyms
         for o in self.rdf_graph.objects(anEntity, ALTERNATIVE_TERM):
             synonyms += [str(o)]
-        return synonyms
+        return list(set(synonyms))
 
 
 def sort_uri_list_by_name(uri_list):
@@ -199,7 +199,7 @@ def getAncestors(parents, terms, key):
         for parent in parents_of_ancestor:
             if parent not in visited and parent not in queue:
                 queue.append(parent)
-    return visited
+    return list(set(visited))
 
 
 def getBaseSlims(term, slimType, slim_candidates):
@@ -213,7 +213,7 @@ def getBaseSlims(term, slimType, slim_candidates):
         shims_override = manual_slims[slimType].get(term, [])
         if shims_override:
             return shims_override
-    return base_slim_names
+    return list(set(base_slim_names))
 
 def get_downLoad_url(owl_file_name):
     ontology_repo = ONTOLOGY_ASSET_DICT[owl_file_name]['ontology_repo']
@@ -352,7 +352,7 @@ def main():
                         terms[term_id]['parents'] = terms[term_id].get('parents', []) + [getTermId(parent)]
                 synonyms = data.getSynonyms(c)
                 if synonyms:
-                    terms[term_id]['synonyms'] = terms[term_id].get('synonyms', []) + synonyms
+                    terms[term_id]['synonyms'] = list(set(terms[term_id].get('synonyms', []) + synonyms))
 
     # Get only CLO terms from the CLO owl file
     data = Inspector(clo_url)
@@ -367,7 +367,7 @@ def main():
                     terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
             synonyms = data.getSynonyms(c)
             if synonyms:
-                terms[term_id]['synonyms'] = terms[term_id].get('synonyms', []) + synonyms
+                terms[term_id]['synonyms'] = list(set(terms[term_id].get('synonyms', []) + synonyms))
 
     for term in terms:
         terms[term]['data'] = list(set(terms[term].get('parents', [])) | set(terms[term].get('part_of', [])) | set(
@@ -402,7 +402,7 @@ def main():
             if term_label:
                 ancestors.append(term_label)
         if ancestors:
-            terms[term]['ancestors'] = ancestors
+            terms[term]['ancestors'] = list(set(ancestors))
         terms[term].pop('closure_with_develops_from', None)
 
     terms.update(ntr_assays)
