@@ -22,7 +22,7 @@ setup(
     },
 
     install_requires = [
-        "rdflib",
-        "requests"
+        "rdflib==6.2.0",
+        "requests==2.27.1"
     ],
 )

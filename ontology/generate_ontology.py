@@ -4,6 +4,7 @@ from urllib.error import HTTPError
 from rdflib import ConjunctiveGraph, Namespace
 from rdflib import RDFS, RDF, BNode, OWL
 from rdflib.collection import Collection
+from rdflib import namespace
 import json
 from datetime import date
 from ontology.ntr_terms import (
@@ -285,8 +286,8 @@ def main():
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
-                                            if str(data.rdf_graph.label(collection[0])):
-                                                terms[term_id]['name'] = str(data.rdf_graph.label(collection[0]))
+                                            if str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default='')):
+                                                terms[term_id]['name'] = str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default=''))
                                             if PREFERRED_NAME.get(term_id):
                                                 terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
                                         terms[term_id]['part_of'] = terms[term_id].get('part_of', []) + [getTermId(subC)]
@@ -295,8 +296,8 @@ def main():
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
-                                            if str(data.rdf_graph.label(collection[0])):
-                                                terms[term_id]['name'] = str(data.rdf_graph.label(collection[0]))
+                                            if str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default='')):
+                                                terms[term_id]['name'] = str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default=''))
                                             if PREFERRED_NAME.get(term_id):
                                                 terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
                                         terms[term_id]['develops_from'] = terms[term_id].get('develops_from', []) + [getTermId(subC)]
@@ -304,8 +305,8 @@ def main():
                 term_id = getTermId(c)
                 if term_id not in terms:
                     terms[term_id] = {}
-                if str(data.rdf_graph.label(c)):
-                    terms[term_id]['name'] = str(data.rdf_graph.label(c))
+                if str(data.rdf_graph.value(c, namespace.RDFS.label, default='')):
+                    terms[term_id]['name'] = str(data.rdf_graph.value(c, namespace.RDFS.label, default=''))
                 if PREFERRED_NAME.get(term_id):
                     terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
                 # Get all parents
@@ -361,8 +362,8 @@ def main():
             term_id = getTermId(c)
             if term_id not in terms:
                 terms[term_id] = {}
-                if str(data.rdf_graph.label(c)):
-                    terms[term_id]['name'] = str(data.rdf_graph.label(c))
+                if str(data.rdf_graph.value(c, namespace.RDFS.label, default='')):
+                    terms[term_id]['name'] = str(data.rdf_graph.value(c, namespace.RDFS.label, default=''))
                 if PREFERRED_NAME.get(term_id):
                     terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
             synonyms = data.getSynonyms(c)
