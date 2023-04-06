@@ -580,4 +580,10 @@ ntr_biosamples = {
         "organs": ["blood", "bodily fluid"],
         "systems": ["immune system"],
     },
+    "NTR:0000754": {
+        "cells": ["endothelial cell"],
+        "name": "TeloHAEC",
+        "organs": ["heart", "aorta"],
+        "systems": ["circulatory system"],
+    },
 }
