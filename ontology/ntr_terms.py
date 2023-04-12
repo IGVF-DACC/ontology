@@ -583,7 +583,7 @@ ntr_biosamples = {
     "NTR:0000756": {
         "cells": ["erythroid progenitor cell"],
         "name": "HUDEP-2",
-        "organs": ["Umbilical cord"],
+        "organs": ["umbilical cord"],
         "systems": ["hematopoietic system"],
     },
 }
