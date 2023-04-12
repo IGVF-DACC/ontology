@@ -580,4 +580,10 @@ ntr_biosamples = {
         "organs": ["blood", "bodily fluid"],
         "systems": ["immune system"],
     },
+    "NTR:0000756": {
+        "cells": ["erythroid progenitor cell"],
+        "name": "Human Umbilical cord blood-Derived Erythroid Progenitor-2",
+        "organs": ["Umbilical cord"],
+        "systems": ["hematopoietic system"],
+    },
 }
