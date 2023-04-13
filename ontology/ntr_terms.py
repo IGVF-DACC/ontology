@@ -580,4 +580,10 @@ ntr_biosamples = {
         "organs": ["blood", "bodily fluid"],
         "systems": ["immune system"],
     },
+    "NTR:0000756": {
+        "cells": ["erythroid progenitor cell"],
+        "name": "HUDEP-2",
+        "organs": ["umbilical cord"],
+        "systems": ["hematopoietic system"],
+    },
 }
