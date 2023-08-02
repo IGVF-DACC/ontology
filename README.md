@@ -44,21 +44,21 @@ How to update the ontology versions
 
     * ontology.json file: N/A
 
-    * UBERON release date: 2022-04-18
+    * UBERON release date: 2023-07-25
 
-    * OBI release date: 2022-01-03
+    * OBI release date:  2023-07-25
 
-    * EFO release date: 2022-04-19
+    * EFO release date:  2023-07-17
 
     * CLO release date: 2022-03-20
 
-    * DOID release date: 2022-04-28
+    * DOID release date:  2023-07-24
 
-    * HP release date: 2022-04-14
+    * HP release date:  2023-07-21
 
-    * MONDO release date: 2022-05-02
+    * MONDO release date:  2023-07-03
 
-    * OBA release date: 2022-05-06
+    * OBA release date:  2023-06-27
 
 7. Resources
 
