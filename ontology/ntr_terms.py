@@ -580,4 +580,9 @@ ntr_biosamples = {
         "organs": ["blood", "bodily fluid"],
         "systems": ["immune system"],
     },
+    "NTR:0000760": {
+        "cells": ["smooth muscle cell"],
+        "name": "HCASMC-hTERT",
+        "organs": ["blood vessel"],
+    },
 }
