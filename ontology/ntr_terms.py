@@ -50,11 +50,6 @@ ntr_assays = {
         "name": "proximity ligation-assisted ChIP-seq",
         "preferred_name": "PLAC-seq",
     },
-    "NTR:0000520": {
-        "assay": ["CRISPR screen"],
-        "name": "CRISPR screen",
-        "preferred_name": "CRISPR screen",
-    },
     "NTR:0000538": {
         "assay": ["RNA structure"],
         "name": "in vivo click light activated structural examination of RNA",
