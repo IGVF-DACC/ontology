@@ -24,6 +24,7 @@ manual_slims = {
         'OBI:0001271': ['Transcription'],  # total RNA-seq
         'OBI:0002753': ['Transcription'],  # PRO-cap
         'OBI:0002457': ['Transcription'],  # PRO-seq
+        'OBI:0002629': ['Transcription'],  # direct RNA-seq
         'OBI:0001863': ['DNA methylation'],  # WGBS
         'OBI:0001862': ['DNA methylation'],  # RRBS
         'OBI:0001861': ['DNA methylation'],  # MRE-seq
@@ -37,8 +38,10 @@ manual_slims = {
         'OBI:0002675': ['Massively parallel reporter assay'], # MPRA
         'OBI:0002041': ['Massively parallel reporter assay'], # STARR-seq
         'OBI:2100402': ['Library preparation'], # pooled clone sequencing
+        'OBI:0002764': ['Single cell', 'DNA accessibility'],  # scATAC-seq
         'OBI:0002762': ['Single cell', 'DNA accessibility'],  # snATAC-seq,
         'OBI:0002631': ['Single cell', 'Transcription'],  # scRNA-seq,
+        'OBI:0003109': ['Single cell', 'Transcription'],  # snRNA-seq,
         'OBI:0002038': ['Ribosome activity'], # Ribo-seq
     },
     'cells': {
