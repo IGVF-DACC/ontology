@@ -130,6 +130,11 @@ ntr_assays = {
         "name": "element activity validation",
         "preferred_name": "element activity validation",
     },
+    "NTR:0000755": {
+        "assay": ["Single cell"],
+        "name": "sample multiplexing for single-cell RNA sequencing using lipid-tagged indices",
+        "preferred_name": "MULTI-seq",
+    },
 }
 
 ntr_biosamples = {
