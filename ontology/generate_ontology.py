@@ -26,6 +26,8 @@ HUMAN_TAXON = OBO['NCBITaxon_9606']
 HAS_PART = OBO['BFO_0000051']
 DERIVES_FROM = OBO['RO_0001000']
 ACHIEVES_PLANNED_OBJECTIVE = OBO['OBI_0000417']
+DEFINITION = OBO['IAO_0000115']
+COMMENT = RDFS.comment
 
 ONTOLOGY_ASSET_DICT = {
     'uberon': {
@@ -110,7 +112,7 @@ class Inspector(object):
 
     """ Class that includes methods for querying an RDFS/OWL ontology """
 
-    def __init__(self, uri, language=''):
+    def __init__(self, uri, comments=False, language=''):
         super(Inspector, self).__init__()
         self.rdf_graph = ConjunctiveGraph()
         try:
@@ -122,6 +124,9 @@ class Inspector(object):
             print("Error:", e)
 
         self.allclasses = self.__getAllClasses()
+        self.definitions = self.__get_all_definitions()
+        if comments:
+            self.comments = self.__get_all_comments()
 
     def __getAllClasses(self):
 
@@ -144,6 +149,21 @@ class Inspector(object):
 
         classes = list(set(classes))
         return sort_uri_list_by_name(classes)
+    
+    def __get_all_definitions(self):
+        definitions = {}
+        for subj, definition in self.rdf_graph.subject_objects(predicate=DEFINITION):
+            definitions[getTermId(subj)] = str(definition)
+        return definitions
+    
+    def __get_all_comments(self):
+        comments = {}
+        for subj, comment in self.rdf_graph.subject_objects(predicate=COMMENT):
+            if getTermId(subj) not in comments:
+               comments[getTermId(subj)] = [str(comment)]
+            else:
+                comments[getTermId(subj)].append(str(comment))
+        return comments
 
     # methods for getting ancestores and descendants of classes: by default, we do not include blank nodes
     def get_classDirectSupers(self, aClass, excludeBnodes=True):
@@ -184,10 +204,10 @@ def sort_uri_list_by_name(uri_list):
 def getTermId(term):
     term_string = str(term)
     if '#' in term_string:
-        term_id = term_string.split('#')[1]
-    else:
-        term_id = term_string.rsplit('/', 1)[1]
-    return term_id.replace('_', ':')
+        return term_string.split('#')[1].replace('_', ':')
+    elif '/' in term_string:
+        return term_string.rsplit('/', 1)[1].replace('_', ':')
+    return term_string
 
 
 def getAncestors(parents, terms, key):
@@ -270,6 +290,7 @@ def main():
     terms = {}
     # Run on ontologies defined in whitelist
     for url in whitelist:
+        print("Processing file from:", url)
         data = Inspector(url)
         for c in data.allclasses:
             if type(c) == BNode:
@@ -286,6 +307,8 @@ def main():
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
+                                            if term_id in data.definitions:
+                                                terms[term_id]['definition'] = data.definitions[term_id]
                                             if str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default='')):
                                                 terms[term_id]['name'] = str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default=''))
                                             if PREFERRED_NAME.get(term_id):
@@ -296,6 +319,8 @@ def main():
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
+                                            if term_id in data.definitions:
+                                                terms[term_id]['definition'] = data.definitions[term_id]
                                             if str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default='')):
                                                 terms[term_id]['name'] = str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default=''))
                                             if PREFERRED_NAME.get(term_id):
@@ -305,6 +330,8 @@ def main():
                 term_id = getTermId(c)
                 if term_id not in terms:
                     terms[term_id] = {}
+                    if term_id in data.definitions:
+                        terms[term_id]['definition'] = data.definitions[term_id]
                 if str(data.rdf_graph.value(c, namespace.RDFS.label, default='')):
                     terms[term_id]['name'] = str(data.rdf_graph.value(c, namespace.RDFS.label, default=''))
                 if PREFERRED_NAME.get(term_id):
@@ -356,12 +383,17 @@ def main():
                     terms[term_id]['synonyms'] = list(set(terms[term_id].get('synonyms', []) + synonyms))
 
     # Get only CLO terms from the CLO owl file
-    data = Inspector(clo_url)
+    print("Processing file from:", clo_url)
+    data = Inspector(clo_url, comments=True)
     for c in data.allclasses:
         if c.startswith('http://purl.obolibrary.org/obo/CLO'):
             term_id = getTermId(c)
             if term_id not in terms:
                 terms[term_id] = {}
+                if term_id in data.definitions:
+                    terms[term_id]['definition'] = data.definitions[term_id]
+                if term_id in data.comments:
+                    terms[term_id]['comments'] = data.comments[term_id]
                 if str(data.rdf_graph.value(c, namespace.RDFS.label, default='')):
                     terms[term_id]['name'] = str(data.rdf_graph.value(c, namespace.RDFS.label, default=''))
                 if PREFERRED_NAME.get(term_id):
