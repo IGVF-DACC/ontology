@@ -112,7 +112,7 @@ class Inspector(object):
 
     """ Class that includes methods for querying an RDFS/OWL ontology """
 
-    def __init__(self, uri, comments=False, language=''):
+    def __init__(self, uri, comments=False):
         super(Inspector, self).__init__()
         self.rdf_graph = ConjunctiveGraph()
         try:
