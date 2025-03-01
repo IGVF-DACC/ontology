@@ -140,22 +140,23 @@ base_slims = {
 
     'assay': {
         # Note shortened synonyms are provided
-        'OBI:0000634': 'DNA methylation',  # 'DNA methylation profiling'
-        'OBI:0000424': 'Transcription',  # 'transcription profiling'
-        'OBI:0001398': 'DNA binding',  # "protein and DNA interaction"
-        'OBI:0001854': 'RNA binding',  # "protein and RNA interaction"
-        'OBI:0001917': '3D chromatin structure',  # 'chromosome conformation identification objective'
-        'OBI:0000870': 'DNA accessibility',  # 'single-nucleotide-resolution nucleic acid structure mapping assay'
-        'OBI:0001916': 'Replication timing',
-        'OBI:0000435': 'Genotyping',
-        'OBI:0000615': 'Proteomics',
-        'OBI:0000626': 'DNA sequencing',
-        'OBI:0000845': 'RNA structure',
-        'OBI:0002082': 'Reporter assay',  # 'Reporter gene assay'
-        'OBI:0002675': 'Massively parallel reporter assay',
-        'OBI:0003659': 'CRISPR screen',
-        'OBI:0000711': 'Library preparation',
-        'NTR:0000675': 'Ribosome activity'
+        # For IGVF, we rely on manual assay slimming, so this section is now commented out.
+        # 'OBI:0000634': 'DNA methylation',  # 'DNA methylation profiling'
+        # 'OBI:0000424': 'Transcription',  # 'transcription profiling'
+        # 'OBI:0001398': 'DNA binding',  # "protein and DNA interaction"
+        # 'OBI:0001854': 'RNA binding',  # "protein and RNA interaction"
+        # 'OBI:0001917': '3D chromatin structure',  # 'chromosome conformation identification objective'
+        # 'OBI:0000870': 'DNA accessibility',  # 'single-nucleotide-resolution nucleic acid structure mapping assay'
+        # 'OBI:0001916': 'Replication timing',
+        # 'OBI:0000435': 'Genotyping',
+        # 'OBI:0000615': 'Proteomics',
+        # 'OBI:0000626': 'DNA sequencing',
+        # 'OBI:0000845': 'RNA structure',
+        # 'OBI:0002082': 'Reporter assay',  # 'Reporter gene assay'
+        # 'OBI:0002675': 'Massively parallel reporter assay',
+        # 'OBI:0003659': 'CRISPR screen',
+        # 'OBI:0000711': 'Library preparation',
+        # 'NTR:0000675': 'Ribosome activity'
     },
 
     'category': {
