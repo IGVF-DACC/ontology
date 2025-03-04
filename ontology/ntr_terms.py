@@ -1,5 +1,8 @@
 ntr_assays = {
-    "NTR:0000612": {"assay": ["RNA binding"], "name": "Switchgear"},
+    "NTR:0000612": {
+        "assay": ["RNA binding"],
+        "name": "Switchgear"
+    },
     "NTR:0000762": {
         "assay": ["Transcription"],
         "name": "shRNA knockdown followed by RNA-seq",
@@ -129,6 +132,14 @@ ntr_assays = {
         "assay": ["element activity validation"],
         "name": "element activity validation",
         "preferred_name": "element activity validation",
+    },
+    "NTR:0000735": {
+        "name": "single cell nascent transcription sequencing",
+        "assay": ["gene expression"]
+    },
+    "NTR:0000745": {
+        "name": "single nucleus methylation chromatin conformation capture seq",
+        "assay": ["multiome"]
     },
 }
 
@@ -580,4 +591,21 @@ ntr_biosamples = {
         "name": "HCASMC-hTERT",
         "organs": ["blood vessel"],
     },
+    "NTR:0000751": {
+        "name": "right hippocampal formation",
+        "developmental": ["ectoderm"],
+        "organs": ["brain"],
+        "systems": ["central nervous system"],
+    },
+    "NTR:0000750": {
+        "name": "left hippocampal formation",
+        "developmental": ["ectoderm"],
+        "organs": ["brain"],
+        "systems": ["central nervous system"],
+    },
+    "NTR:0000753": {
+        "name": "TeloHAEC",
+        "organs": ["heart"],
+        "cells": ["endothelial cell"],
+    }
 }

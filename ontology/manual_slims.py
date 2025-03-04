@@ -1,48 +1,33 @@
 manual_slims = {
     # this allows us to manually assign term X to slim Y while waiting for ontology updates
     'assay': {
-        # DNA accessibility
-        'OBI:0001924': ['DNA accessibility'],  # 'OBI:0000870' / MNase-seq
-        'OBI:0002039': ['DNA accessibility'],  # 'OBI:0000870', / ATAC-seq,
-        'OBI:0001853': ['DNA accessibility'],  # 'OBI:0000870', / DNase-seq
-        'OBI:0001859': ['DNA accessibility'],  # 'OBI:0000870', / OBI:0000424  / FAIRE-seq
-        'OBI:0002042': ['3D chromatin structure'],  # 'OBI:0000870' (Hi-C)
-        'OBI:0001848': ['3D chromatin structure'],  # ChIA-PET / OBI:000870
-        'OBI:0001923': ['Proteomics'],  # OBI:0000615': 'MS-MS'
-        'OBI:0001849': ['Genotyping'],  # OBI:0000435 (DNA-PET)
-        'OBI:0002044': ['RNA binding'],  # OBI:0001854 (RNA-Bind-N-Seq)
-        'OBI:0002091': ['Transcription'],  # 5' RACE
-        'OBI:0002092': ['Transcription'],  # 3' RACE
-        'OBI:0002093': ['Transcription'],  # 5' RLM RACE
-        'OBI:0002113': ['Transcription'],  # Bru-seq
-        'OBI:0002114': ['Transcription'],  # BruChase-seq
-        'OBI:0002143': ['Transcription'],  # BruUV-seq
-        'OBI:0002045': ['Transcription'],  # PAS-seq
-        'OBI:0002571': ['Transcription'],  # polyA plus RNA-seq
-        'OBI:0002572': ['Transcription'],  # polyA minus RNA-seq
-        'OBI:0002112': ['Transcription'],  # small RNA-seq
-        'OBI:0001271': ['Transcription'],  # total RNA-seq
-        'OBI:0002753': ['Transcription'],  # PRO-cap
-        'OBI:0002457': ['Transcription'],  # PRO-seq
-        'OBI:0002629': ['Transcription'],  # direct RNA-seq
-        'OBI:0001863': ['DNA methylation'],  # WGBS
-        'OBI:0001862': ['DNA methylation'],  # RRBS
-        'OBI:0001861': ['DNA methylation'],  # MRE-seq
-        'OBI:0002086': ['DNA methylation'],  # TAB-seq
-        'OBI:0000716': ['DNA binding'], # ChIP-seq
-        'OBI:0001919': ['3D chromatin structure'], # 5C
-        'OBI:0002160': ['DNA binding'], # Mint-ChIP-seq
-        'OBI:0003033': ['DNA binding'], # CUT&RUN
-        'OBI:0003034': ['DNA binding'], # CUT&Tag
-        'OBI:0002083': ['Reporter assay'], # enhancer reporter assay
-        'OBI:0002675': ['Massively parallel reporter assay'], # MPRA
-        'OBI:0002041': ['Massively parallel reporter assay'], # STARR-seq
-        'OBI:2100402': ['Library preparation'], # pooled clone sequencing
-        'OBI:0002764': ['Single cell', 'DNA accessibility'],  # scATAC-seq
-        'OBI:0002762': ['Single cell', 'DNA accessibility'],  # snATAC-seq,
-        'OBI:0002631': ['Single cell', 'Transcription'],  # scRNA-seq,
-        'OBI:0003109': ['Single cell', 'Transcription'],  # snRNA-seq,
-        'OBI:0002038': ['Ribosome activity'], # Ribo-seq
+        'OBI:0002458': ['3D chromatin structure'],  # chromosome conformation capture-on-chip assay
+        'OBI:0002440': ['3D chromatin structure'],  # Hi-C assay
+        'OBI:0003302': ['3D chromatin structure'],  # micro-C assay
+        'OBI:0002762': ['chromatin accessibility'],  # snATAC-seq
+        'OBI:0002764': ['chromatin accessibility'],  # scATAC-seq
+        'OBI:0003089': ['chromatin accessibility'],  # bulk ATAC-seq
+        'OBI:0000716': ['DNA binding'],  # ChIP-seq
+        'OBI:0002017': ['DNA binding'],  # histone ChIP-Seq assay
+        'OBI:0002019': ['DNA binding'],  # TF ChIP-Seq assay
+        'OBI:0003687': ['DNA methylation'],  # m6A-MTase sequencing assay (Fiber-seq)
+        'OBI:0001266': ['DNA methylation'],  # DNA methylation profiling by high throughput sequencing assay
+        'OBI:0002117': ['genetic profiling'],  # WGS assay
+        'OBI:0000435': ['genetic profiling'],  # Genotyping array
+        'OBI:0003133': ['CRISPR screens'],  # cas mediated mutagenesis
+        'OBI:0003659': ['CRISPR screens'],  # in vitro CRISPR screen assay
+        'OBI:0003660': ['CRISPR screens'],  # in vitro CRISPR screen using single-cell RNA-seq
+        'OBI:0003661': ['CRISPR screens'],  # in vitro CRISPR screen using flow cytometry
+        'OBI:0003090': ['gene expression'],  # bulk RNA-seq assay
+        'OBI:0002629': ['gene expression'],  # direct RNA sequencing assay
+        'OBI:0002631': ['gene expression'],  # single-cell RNA sequencing assay
+        'OBI:0003109': ['gene expression'],  # single-nucleus RNA sequencing assay
+        'OBI:0000185': ['imaging'],  # imaging assay
+        'OBI:0003662': ['multiome'],  # single-nucleus methylcytosine and transcriptome sequencing assay
+        'OBI:0002675': ['reporter'],  # MPRA
+        'OBI:0002041': ['reporter'],  # STARR-seq
+        'OBI:0000288': ['protein'],  # protein-protein interaction detection assay
+        'OBI:0000916': ['protein'],  # flow cytometry assay (VAMP-seq)
     },
     'cells': {
         'CL:0000038': ['hematopoietic cell', 'myeloid cell', 'progenitor cell'], # 'hematopoietic cell' & 'myeloid cell' are ontology-based
