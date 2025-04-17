@@ -18,6 +18,7 @@ from ontology.base_slims import base_slims
 OBO_OWL = Namespace('http://www.geneontology.org/formats/oboInOwl#')
 OBO = Namespace('http://purl.obolibrary.org/obo/')
 
+
 ALTERNATIVE_TERM = OBO['IAO_0000118']
 HAS_EXACT_SYNONYM = OBO_OWL['hasExactSynonym']
 PART_OF = OBO['BFO_0000050']
@@ -28,6 +29,10 @@ DERIVES_FROM = OBO['RO_0001000']
 ACHIEVES_PLANNED_OBJECTIVE = OBO['OBI_0000417']
 DEFINITION = OBO['IAO_0000115']
 COMMENT = RDFS.comment
+OBOINOWL_DEPRECATED = OBO_OWL['deprecated']
+OWL_DEPRECATED = OWL['deprecated']
+OBOINOWL_OBSOLETE_CLASS = OBO_OWL['ObsoleteClass']
+
 
 ONTOLOGY_ASSET_DICT = {
     'uberon': {
@@ -128,6 +133,24 @@ class Inspector(object):
         if comments:
             self.comments = self.__get_all_comments()
 
+    def __is_obsolete(self, subject):
+        # Check for owl:deprecated true or oboInOwl:deprecated true
+        for predicate in [OWL.deprecated, OBOINOWL_DEPRECATED]:
+            for _, _, obj in self.rdf_graph.triples((subject, predicate, None)):
+                if str(obj).lower() == "true":
+                    return True
+
+        # Check if class is a subclass of oboInOwl:ObsoleteClass
+        for _, _, obj in self.rdf_graph.triples((subject, RDFS.subClassOf, OBOINOWL_OBSOLETE_CLASS)):
+            return True
+
+        # Check if the label starts with "obsolete:"
+        for _, _, label in self.rdf_graph.triples((subject, RDFS.label, None)):
+            if str(label).lower().startswith("obsolete:"):
+                return True
+
+        return False
+
     def __getAllClasses(self):
 
         classes = []
@@ -148,7 +171,8 @@ class Inspector(object):
             classes.append(o)
 
         classes = list(set(classes))
-        return sort_uri_list_by_name(classes)
+        non_obsolete_classes = [cls for cls in classes if not self.__is_obsolete(cls)]
+        return sort_uri_list_by_name(non_obsolete_classes)
     
     def __get_all_definitions(self):
         definitions = {}
@@ -215,11 +239,13 @@ def getAncestors(parents, terms, key):
     queue = parents.copy()
     while queue:
         ancestor = queue.pop()
-        visited.append(ancestor)
-        parents_of_ancestor = terms[ancestor][key]
-        for parent in parents_of_ancestor:
-            if parent not in visited and parent not in queue:
-                queue.append(parent)
+        # ancestor can be obsolete, then ignore it
+        if ancestor in terms:
+            visited.append(ancestor)
+            parents_of_ancestor = terms[ancestor][key]
+            for parent in parents_of_ancestor:
+                if parent not in visited and parent not in queue:
+                    queue.append(parent)
     return list(set(visited))
 
 
@@ -401,7 +427,7 @@ def main():
             synonyms = data.getSynonyms(c)
             if synonyms:
                 terms[term_id]['synonyms'] = list(set(terms[term_id].get('synonyms', []) + synonyms))
-
+    
     for term in terms:
         terms[term]['data'] = list(set(terms[term].get('parents', [])) | set(terms[term].get('part_of', [])) | set(
             terms[term].get('derives_from', [])) | set(terms[term].get('achieves_planned_objective', [])))
