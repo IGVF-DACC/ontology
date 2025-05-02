@@ -14,6 +14,7 @@ manual_slims = {
         'OBI:0001266': ['DNA methylation'],  # DNA methylation profiling by high throughput sequencing assay
         'OBI:0002117': ['genetic profiling'],  # WGS assay
         'OBI:0000435': ['genetic profiling'],  # Genotyping array
+        'OBI:0000626': ['genetic profiling'],  # DNA sequencing assay
         'OBI:0003133': ['CRISPR screens'],  # cas mediated mutagenesis
         'OBI:0003659': ['CRISPR screens'],  # in vitro CRISPR screen assay
         'OBI:0003660': ['CRISPR screens'],  # in vitro CRISPR screen using single-cell RNA-seq

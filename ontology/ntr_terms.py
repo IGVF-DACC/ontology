@@ -53,6 +53,10 @@ ntr_assays = {
         "name": "proximity ligation-assisted ChIP-seq",
         "preferred_name": "PLAC-seq",
     },
+    "NTR:0000520": {
+        "assay": ["CRISPR screens"],
+        "name": "CRISPR screen"
+    },
     "NTR:0000538": {
         "assay": ["RNA structure"],
         "name": "in vivo click light activated structural examination of RNA",
@@ -140,6 +144,18 @@ ntr_assays = {
     "NTR:0000745": {
         "name": "single nucleus methylation chromatin conformation capture seq",
         "assay": ["multiome"]
+    },
+    "NTR:0000761": {
+        "name": "spatial transcriptomics",
+        "assay": ["gene expression"]
+    },
+    "NTR:000789": {
+        "name": "single cell massively parallel reporter assay",
+        "assay": ["reporter"]
+    },
+    "NTR:0000787": {
+        "name": "blended genome exome sequencing",
+        "assay": ["genetic profiling"]
     },
 }
 
