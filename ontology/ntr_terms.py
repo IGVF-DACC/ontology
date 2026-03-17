@@ -157,6 +157,18 @@ ntr_assays = {
         "name": "blended genome exome sequencing",
         "assay": ["genetic profiling"]
     },
+    "NTR:0001094": {
+        "name": "yeast-based functional complementation assay",
+        "assay": ["protein"]
+    },
+    "NTR:0001101": {
+        "name": "in vivo CRISPR screen using single cell RNA-seq",
+        "assay": ["CRISPR screens"]
+    },
+    "NTR:000798": {
+        "name": "in vitro CRISPR screen using single-cell ATAC-seq",
+        "assay": ["CRISPR screens"]
+    }
 }
 
 ntr_biosamples = {
