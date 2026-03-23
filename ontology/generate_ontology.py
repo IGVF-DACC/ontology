@@ -74,6 +74,11 @@ ONTOLOGY_ASSET_DICT = {
         'ontology_repo': 'obophenotype/human-phenotype-ontology',
         'asset_name': 'hp.owl',
         'uri': 'http://purl.obolibrary.org/obo/hp.owl'
+    },
+    'ncit': {
+        'ontology_repo': 'ncit-obo-org/ncit-obo-edition',
+        'asset_name': 'ncit.owl',
+        'uri': 'http://purl.obolibrary.org/obo/ncit.owl'
     }
 }
 
@@ -309,8 +314,10 @@ def main():
     mondo_url = get_downLoad_url('mondo')
     # Ontology of Biological Attributes covering all kingdoms of life
     oba_url = get_downLoad_url('oba')
+    # NCI Thesaurus
+    ncit_url = get_downLoad_url('ncit')
 
-    whitelist = [uberon_url, efo_url, obi_url, doid_url, hp_url, mondo_url, oba_url]
+    whitelist = [uberon_url, efo_url, obi_url, doid_url, hp_url, mondo_url, oba_url, ncit_url]
     
     print("Generating ontology file...")
     terms = {}
