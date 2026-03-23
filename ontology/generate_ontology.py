@@ -79,6 +79,11 @@ ONTOLOGY_ASSET_DICT = {
         'ontology_repo': 'ncit-obo-org/ncit-obo-edition',
         'asset_name': 'ncit.owl',
         'uri': 'http://purl.obolibrary.org/obo/ncit.owl'
+    },
+    'pcl': {
+        'ontology_repo': 'obophenotype/provisional_cell_ontology',
+        'asset_name': 'pcl.owl',
+        'uri': 'http://purl.obolibrary.org/obo/pcl.owl'
     }
 }
 
@@ -316,8 +321,10 @@ def main():
     oba_url = get_downLoad_url('oba')
     # NCI Thesaurus
     ncit_url = get_downLoad_url('ncit')
+    # Provisional Cell Ontology
+    pcl_url = get_downLoad_url('pcl')
 
-    whitelist = [uberon_url, efo_url, obi_url, doid_url, hp_url, mondo_url, oba_url, ncit_url]
+    whitelist = [uberon_url, efo_url, obi_url, doid_url, hp_url, mondo_url, oba_url, ncit_url, pcl_url]
     
     print("Generating ontology file...")
     terms = {}
