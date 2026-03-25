@@ -14,6 +14,9 @@ Ontology files to use
 * [The Human Phenotype Ontology (HPO): hp.owl](http://purl.obolibrary.org/obo/hp.owl)
 * [Mondo Disease Ontology (MONDO): mondo.owl](http://purl.obolibrary.org/obo/mondo/releases/2022-04-04/mondo.owl)
 * [Ontology of Biological Attributes covering all kingdoms of life (OBA): oba.owl](http://purl.obolibrary.org/obo/oba.owl)
+* [Provisional Cell Ontology (PCL): pcl.owl](http://purl.obolibrary.org/obo/pcl.owl)
+* [NCI Thesaurus (NCIT): ncit.owl](http://purl.obolibrary.org/obo/ncit.owl)
+* [Gene Ontology (GO): go.owl](https://purl.obolibrary.org/obo/go.owl)
 
 How to update the ontology versions
 ----------------
@@ -44,21 +47,27 @@ How to update the ontology versions
 
     * ontology.json file: N/A
 
-    * UBERON release date: 2023-07-25
+    * UBERON release date: 2025-12-04
 
-    * OBI release date:  2023-07-25
+    * OBI release date:  2025-12-18
 
-    * EFO release date:  2023-07-17
+    * EFO release date:  2026-03-16
 
-    * CLO release date: 2022-03-20
+    * CLO release date: 2023-03-28
 
-    * DOID release date:  2023-07-24
+    * DOID release date:  2026-02-28
 
-    * HP release date:  2023-07-21
+    * HP release date:  2026-02-16
 
-    * MONDO release date:  2023-07-03
+    * MONDO release date:  2026-03-03
 
-    * OBA release date:  2023-06-27
+    * OBA release date:  2025-10-29
+
+    * NCIT release date:  2026-03-19
+
+    * PCL release date:  2025-07-07
+
+    * GO release date:  2026-01-23
 
 7. Resources
 
@@ -93,3 +102,9 @@ How to update the ontology versions
     * [CLO release date](http://www.ontobee.org/ontology/CLO)
 
     * [DOID release date](http://www.ontobee.org/ontology/DOID)
+
+    * [Provisional Cell Ontology (PCL)](https://obofoundry.org/ontology/pcl.html)
+
+    * [NCI Thesaurus (NCIT)](https://github.com/ncit-obo-org/ncit-obo-edition)
+
+    * [Gene Ontology (GO)](https://geneontology.org/)

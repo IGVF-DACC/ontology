@@ -10,8 +10,10 @@ manual_slims = {
         'OBI:0000716': ['DNA binding'],  # ChIP-seq
         'OBI:0002017': ['DNA binding'],  # histone ChIP-Seq assay
         'OBI:0002019': ['DNA binding'],  # TF ChIP-Seq assay
+        'OBI:0003033': ['DNA binding'],  # cleavage under targets and release using nuclease assay (CUT&RUN)
         'OBI:0003687': ['DNA methylation'],  # m6A-MTase sequencing assay (Fiber-seq)
         'OBI:0001266': ['DNA methylation'],  # DNA methylation profiling by high throughput sequencing assay
+        'OBI:0000748': ['DNA methylation'],  # bisulfite sequencing assay (Bisulfite-seq)
         'OBI:0002117': ['genetic profiling'],  # WGS assay
         'OBI:0000435': ['genetic profiling'],  # Genotyping array
         'OBI:0000626': ['genetic profiling'],  # DNA sequencing assay
@@ -27,6 +29,7 @@ manual_slims = {
         'OBI:0003662': ['multiome'],  # single-nucleus methylcytosine and transcriptome sequencing assay
         'OBI:0002675': ['reporter'],  # MPRA
         'OBI:0002041': ['reporter'],  # STARR-seq
+        'OBI:0002082': ['reporter'],  # LABEL-seq
         'OBI:0000288': ['protein'],  # protein-protein interaction detection assay
         'OBI:0000916': ['protein'],  # flow cytometry assay (VAMP-seq)
     },

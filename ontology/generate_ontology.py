@@ -74,6 +74,22 @@ ONTOLOGY_ASSET_DICT = {
         'ontology_repo': 'obophenotype/human-phenotype-ontology',
         'asset_name': 'hp.owl',
         'uri': 'http://purl.obolibrary.org/obo/hp.owl'
+    },
+    'ncit': {
+        'ontology_repo': 'ncit-obo-org/ncit-obo-edition',
+        'asset_name': 'ncit.owl',
+        'uri': 'http://purl.obolibrary.org/obo/ncit.owl'
+    },
+    'pcl': {
+        'ontology_repo': 'obophenotype/provisional_cell_ontology',
+        'asset_name': 'pcl.owl',
+        'uri': 'http://purl.obolibrary.org/obo/pcl.owl'
+    },
+    'go': {
+        # GO does not host files on their Github. https://github.com/geneontology
+        'ontology_repo': '',
+        'asset_name': '',
+        'uri': 'https://purl.obolibrary.org/obo/go.owl'
     }
 }
 
@@ -309,8 +325,14 @@ def main():
     mondo_url = get_downLoad_url('mondo')
     # Ontology of Biological Attributes covering all kingdoms of life
     oba_url = get_downLoad_url('oba')
+    # NCI Thesaurus
+    ncit_url = get_downLoad_url('ncit')
+    # Provisional Cell Ontology
+    pcl_url = get_downLoad_url('pcl')
+    # Gene Ontology
+    go_url = get_downLoad_url('go')
 
-    whitelist = [uberon_url, efo_url, obi_url, doid_url, hp_url, mondo_url, oba_url]
+    whitelist = [uberon_url, efo_url, obi_url, doid_url, hp_url, mondo_url, oba_url, ncit_url, pcl_url, go_url]
     
     print("Generating ontology file...")
     terms = {}
