@@ -355,8 +355,8 @@ def main():
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
-                                            if term_id in data.definitions:
-                                                terms[term_id]['definition'] = data.definitions[term_id]
+                                        if term_id in data.definitions and not terms[term_id].get('definition'):
+                                            terms[term_id]['definition'] = data.definitions[term_id]
                                             if str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default='')):
                                                 terms[term_id]['name'] = str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default=''))
                                             if PREFERRED_NAME.get(term_id):
@@ -367,8 +367,8 @@ def main():
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
-                                            if term_id in data.definitions:
-                                                terms[term_id]['definition'] = data.definitions[term_id]
+                                        if term_id in data.definitions and not terms[term_id].get('definition'):
+                                            terms[term_id]['definition'] = data.definitions[term_id]
                                             if str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default='')):
                                                 terms[term_id]['name'] = str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default=''))
                                             if PREFERRED_NAME.get(term_id):
@@ -378,8 +378,8 @@ def main():
                 term_id = getTermId(c)
                 if term_id not in terms:
                     terms[term_id] = {}
-                    if term_id in data.definitions:
-                        terms[term_id]['definition'] = data.definitions[term_id]
+                if term_id in data.definitions and not terms[term_id].get('definition'):
+                    terms[term_id]['definition'] = data.definitions[term_id]
                 if str(data.rdf_graph.value(c, namespace.RDFS.label, default='')):
                     terms[term_id]['name'] = str(data.rdf_graph.value(c, namespace.RDFS.label, default=''))
                 if PREFERRED_NAME.get(term_id):
@@ -438,14 +438,14 @@ def main():
             term_id = getTermId(c)
             if term_id not in terms:
                 terms[term_id] = {}
-                if term_id in data.definitions:
-                    terms[term_id]['definition'] = data.definitions[term_id]
                 if term_id in data.comments:
                     terms[term_id]['comments'] = data.comments[term_id]
                 if str(data.rdf_graph.value(c, namespace.RDFS.label, default='')):
                     terms[term_id]['name'] = str(data.rdf_graph.value(c, namespace.RDFS.label, default=''))
                 if PREFERRED_NAME.get(term_id):
                     terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
+            if term_id in data.definitions and not terms[term_id].get('definition'):
+                terms[term_id]['definition'] = data.definitions[term_id]
             synonyms = data.getSynonyms(c)
             if synonyms:
                 terms[term_id]['synonyms'] = list(set(terms[term_id].get('synonyms', []) + synonyms))
