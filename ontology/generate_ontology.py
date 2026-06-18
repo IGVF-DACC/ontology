@@ -5,7 +5,9 @@ from rdflib import ConjunctiveGraph, Namespace
 from rdflib import RDFS, RDF, BNode, OWL
 from rdflib.collection import Collection
 from rdflib import namespace
+import argparse
 import json
+import os
 from datetime import date
 from ontology.ntr_terms import (
     ntr_assays,
@@ -34,11 +36,31 @@ OWL_DEPRECATED = OWL['deprecated']
 OBOINOWL_OBSOLETE_CLASS = OBO_OWL['ObsoleteClass']
 
 
+def get_ontology_files_dir():
+    """Return repo-root ontology_files/ (works when installed in site-packages)."""
+    for start in (os.getcwd(), os.path.dirname(__file__)):
+        path = os.path.abspath(start)
+        while True:
+            if os.path.isfile(os.path.join(path, 'setup.py')):
+                return os.path.join(path, 'ontology_files')
+            parent = os.path.dirname(path)
+            if parent == path:
+                break
+            path = parent
+
+    return os.path.join(os.getcwd(), 'ontology_files')
+
+
 ONTOLOGY_ASSET_DICT = {
     'uberon': {
         'ontology_repo': 'obophenotype/uberon',
         'asset_name': 'composite-metazoan.owl',
         'uri': 'http://purl.obolibrary.org/obo/uberon.owl'
+    },
+    'cl': {
+        'ontology_repo': 'obophenotype/cell-ontology',
+        'asset_name': 'cl.owl',
+        'uri': 'http://purl.obolibrary.org/obo/cl.owl'
     },
     'efo': {
         'ontology_repo': 'EBISPOT/efo',
@@ -136,6 +158,7 @@ class Inspector(object):
     def __init__(self, uri, comments=False):
         super(Inspector, self).__init__()
         self.rdf_graph = ConjunctiveGraph()
+        self.source = uri
         try:
             self.rdf_graph.parse(uri, format='application/rdf+xml')
         except HTTPError:
@@ -308,38 +331,87 @@ def get_downLoad_url(owl_file_name):
     return download_url
 
 
-def main():
-    # Uberon multi-species anatomy ontology for biosample
-    uberon_url = get_downLoad_url('uberon')
-    # The Experimental Factor Ontology (EFO) for biosample
-    efo_url = get_downLoad_url('efo')
-    # Ontology for Biomedical Investigations for assays
-    obi_url = get_downLoad_url('obi')
-    # The Cell Line Ontology for cell line information for biosamples
-    clo_url = get_downLoad_url('clo')
-    # Human Disease Ontology for disease
-    doid_url = get_downLoad_url('doid')
-    # The Human Phenotype Ontology (HPO) for disease
-    hp_url = get_downLoad_url('hp')
-    # Mondo Disease Ontology for disease
-    mondo_url = get_downLoad_url('mondo')
-    # Ontology of Biological Attributes covering all kingdoms of life
-    oba_url = get_downLoad_url('oba')
-    # NCI Thesaurus
-    ncit_url = get_downLoad_url('ncit')
-    # Provisional Cell Ontology
-    pcl_url = get_downLoad_url('pcl')
-    # Gene Ontology
-    go_url = get_downLoad_url('go')
+def download_ontology_file(url, local_path, force=False):
+    """Download an OWL file to local_path unless a cached copy already exists."""
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    if os.path.isfile(local_path) and not force:
+        print(f"Using cached file: {local_path}")
+        return local_path
 
-    whitelist = [uberon_url, efo_url, obi_url, doid_url, hp_url, mondo_url, oba_url, ncit_url, pcl_url, go_url]
+    print(f"Downloading {url}")
+    print(f"Saving to {local_path}")
+    response = requests.get(url, stream=True, timeout=600)
+    response.raise_for_status()
+    with open(local_path, 'wb') as outfile:
+        for chunk in response.iter_content(chunk_size=1024 * 1024):
+            if chunk:
+                outfile.write(chunk)
+    return local_path
+
+
+def ensure_local_ontology(owl_file_name, force=False):
+    """Resolve download URL and return a local path to the OWL file."""
+    url = get_downLoad_url(owl_file_name)
+    asset_name = ONTOLOGY_ASSET_DICT[owl_file_name]['asset_name']
+    if not asset_name:
+        asset_name = owl_file_name + '.owl'
+    local_path = os.path.join(get_ontology_files_dir(), asset_name)
+    return download_ontology_file(url, local_path, force=force)
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(
+        description='Generate ontology JSON from OWL release files.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""Examples:
+  %(prog)s
+  %(prog)s --force-download""",
+    )
+    parser.add_argument(
+        '--force-download',
+        action='store_true',
+        help='Re-download OWL files even when cached copies exist in ontology_files/.',
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    force_download = args.force_download
+
+    # Uberon multi-species anatomy ontology for biosample
+    uberon_path = ensure_local_ontology('uberon', force=force_download)
+    # Cell Ontology (loaded after composite-metazoan for fresher CL terms)
+    cl_path = ensure_local_ontology('cl', force=force_download)
+    # The Experimental Factor Ontology (EFO) for biosample
+    efo_path = ensure_local_ontology('efo', force=force_download)
+    # Ontology for Biomedical Investigations for assays
+    obi_path = ensure_local_ontology('obi', force=force_download)
+    # The Cell Line Ontology for cell line information for biosamples
+    clo_path = ensure_local_ontology('clo', force=force_download)
+    # Human Disease Ontology for disease
+    doid_path = ensure_local_ontology('doid', force=force_download)
+    # The Human Phenotype Ontology (HPO) for disease
+    hp_path = ensure_local_ontology('hp', force=force_download)
+    # Mondo Disease Ontology for disease
+    mondo_path = ensure_local_ontology('mondo', force=force_download)
+    # Ontology of Biological Attributes covering all kingdoms of life
+    oba_path = ensure_local_ontology('oba', force=force_download)
+    # NCI Thesaurus
+    ncit_path = ensure_local_ontology('ncit', force=force_download)
+    # Provisional Cell Ontology
+    pcl_path = ensure_local_ontology('pcl', force=force_download)
+    # Gene Ontology
+    go_path = ensure_local_ontology('go', force=force_download)
+
+    whitelist = [uberon_path, cl_path, efo_path, obi_path, doid_path, hp_path, mondo_path, oba_path, ncit_path, pcl_path, go_path]
     
     print("Generating ontology file...")
     terms = {}
     # Run on ontologies defined in whitelist
-    for url in whitelist:
-        print("Processing file from:", url)
-        data = Inspector(url)
+    for path in whitelist:
+        print("Processing file from:", path)
+        data = Inspector(path)
         for c in data.allclasses:
             if type(c) == BNode:
                 for o in data.rdf_graph.objects(c, RDFS.subClassOf):
@@ -431,8 +503,8 @@ def main():
                     terms[term_id]['synonyms'] = list(set(terms[term_id].get('synonyms', []) + synonyms))
 
     # Get only CLO terms from the CLO owl file
-    print("Processing file from:", clo_url)
-    data = Inspector(clo_url, comments=True)
+    print("Processing file from:", clo_path)
+    data = Inspector(clo_path, comments=True)
     for c in data.allclasses:
         if c.startswith('http://purl.obolibrary.org/obo/CLO'):
             term_id = getTermId(c)

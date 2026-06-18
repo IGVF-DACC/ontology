@@ -6,13 +6,16 @@ This document describes how to update the ontology versions used for searching a
 Ontology files to use
 ----------------
 
-* [Uber anatomy ontology (Uberon) and Cell Ontology (CL): composite-metazoan.owl](https://github.com/obophenotype/uberon/releases/download/v2022-04-18/composite-metazoan.owl)
-* [Experimental Factor Ontology (EFO): EFO_inferred.owl](https://github.com/EBISPOT/efo/releases/download/v3.41.0/efo.owl)
+The `generate_ontology` script downloads the latest release of each ontology (when needed), caches OWL files locally in `ontology_files/`, and parses them to produce `ontology-YYYY-MM-DD.json`.
+
+* [Uber anatomy ontology (Uberon): composite-metazoan.owl](https://github.com/obophenotype/uberon/releases)
+* [Cell Ontology (CL): cl.owl](https://github.com/obophenotype/cell-ontology/releases) — loaded after composite-metazoan for fresher CL terms
+* [Experimental Factor Ontology (EFO): efo.owl](https://github.com/EBISPOT/efo/releases)
 * [Ontology for Biomedical Investigations (OBI): obi.owl](http://purl.obolibrary.org/obo/obi.owl)
 * [Cell Line Ontology (CLO): clo.owl](http://purl.obolibrary.org/obo/clo.owl)
 * [Human Disease Ontology (DOID): doid.owl](http://purl.obolibrary.org/obo/doid.owl)
 * [The Human Phenotype Ontology (HPO): hp.owl](http://purl.obolibrary.org/obo/hp.owl)
-* [Mondo Disease Ontology (MONDO): mondo.owl](http://purl.obolibrary.org/obo/mondo/releases/2022-04-04/mondo.owl)
+* [Mondo Disease Ontology (MONDO): mondo.owl](http://purl.obolibrary.org/obo/mondo.owl)
 * [Ontology of Biological Attributes covering all kingdoms of life (OBA): oba.owl](http://purl.obolibrary.org/obo/oba.owl)
 * [Provisional Cell Ontology (PCL): pcl.owl](http://purl.obolibrary.org/obo/pcl.owl)
 * [NCI Thesaurus (NCIT): ncit.owl](http://purl.obolibrary.org/obo/ncit.owl)
@@ -27,7 +30,13 @@ How to update the ontology versions
 
 2. Run generate_ontology:
 
+    By default, the script uses cached OWL files in `ontology_files/` when they exist. Missing files are downloaded automatically.
+
     `generate_ontology`
+
+    To re-download all ontology files from their latest releases:
+
+    `generate_ontology --force-download`
 
 3. The ontology file generated has a file name format like this:       ontology-YYYY-MM-DD.json
 
@@ -48,6 +57,8 @@ How to update the ontology versions
     * ontology.json file: N/A
 
     * UBERON release date: 2025-12-04
+
+    * CL release date: 2026-06-15
 
     * OBI release date:  2025-12-18
 
@@ -85,6 +96,8 @@ How to update the ontology versions
 
     * [Uberon download](https://github.com/obophenotype/uberon/releases)
 
+    * [Cell Ontology (CL) download](https://github.com/obophenotype/cell-ontology/releases)
+
     * [EFO src tree](https://github.com/EBISPOT/efo/)
 
     * [OBI download](http://www.ontobee.org/ontology/OBI)
@@ -94,6 +107,8 @@ How to update the ontology versions
     * [DOID download](http://www.ontobee.org/ontology/DOID)
 
     * [UBERON release date](https://github.com/obophenotype/uberon/releases)
+
+    * [CL release date](https://github.com/obophenotype/cell-ontology/releases)
 
     * [OBI release date](https://github.com/obi-ontology/obi/releases)
 
