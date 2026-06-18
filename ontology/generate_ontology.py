@@ -158,7 +158,6 @@ class Inspector(object):
     def __init__(self, uri, comments=False):
         super(Inspector, self).__init__()
         self.rdf_graph = ConjunctiveGraph()
-        self.source = uri
         try:
             self.rdf_graph.parse(uri, format='application/rdf+xml')
         except HTTPError:
@@ -324,22 +323,28 @@ def get_downLoad_url(owl_file_name):
     print(asset_name + ':', download_url)
     if data:
         print('release name: ' + data['name'])
-        print('release tag: ' + data['tag_name'] + '\n')
+        print('release tag: ' + data['tag_name'])
     else:
-        print('release info: not available \n')
+        print('release info: not available')
 
     return download_url
 
 
-def download_ontology_file(url, local_path, force=False):
-    """Download an OWL file to local_path unless a cached copy already exists."""
+def get_local_ontology_path(owl_file_name, force=False):
+    """Return a local path to an OWL file, downloading it when not cached."""
+    url = get_downLoad_url(owl_file_name)
+    asset_name = ONTOLOGY_ASSET_DICT[owl_file_name]['asset_name']
+    if not asset_name:
+        asset_name = owl_file_name + '.owl'
+    local_path = os.path.join(get_ontology_files_dir(), asset_name)
+
     os.makedirs(os.path.dirname(local_path), exist_ok=True)
     if os.path.isfile(local_path) and not force:
-        print(f"Using cached file: {local_path}")
+        print(f"Using cached file: {local_path}\n")
         return local_path
 
     print(f"Downloading {url}")
-    print(f"Saving to {local_path}")
+    print(f"Saving to {local_path}\n")
     response = requests.get(url, stream=True, timeout=600)
     response.raise_for_status()
     with open(local_path, 'wb') as outfile:
@@ -347,16 +352,6 @@ def download_ontology_file(url, local_path, force=False):
             if chunk:
                 outfile.write(chunk)
     return local_path
-
-
-def ensure_local_ontology(owl_file_name, force=False):
-    """Resolve download URL and return a local path to the OWL file."""
-    url = get_downLoad_url(owl_file_name)
-    asset_name = ONTOLOGY_ASSET_DICT[owl_file_name]['asset_name']
-    if not asset_name:
-        asset_name = owl_file_name + '.owl'
-    local_path = os.path.join(get_ontology_files_dir(), asset_name)
-    return download_ontology_file(url, local_path, force=force)
 
 
 def parse_args(argv=None):
@@ -380,29 +375,29 @@ def main(argv=None):
     force_download = args.force_download
 
     # Uberon multi-species anatomy ontology for biosample
-    uberon_path = ensure_local_ontology('uberon', force=force_download)
+    uberon_path = get_local_ontology_path('uberon', force=force_download)
     # Cell Ontology (loaded after composite-metazoan for fresher CL terms)
-    cl_path = ensure_local_ontology('cl', force=force_download)
+    cl_path = get_local_ontology_path('cl', force=force_download)
     # The Experimental Factor Ontology (EFO) for biosample
-    efo_path = ensure_local_ontology('efo', force=force_download)
+    efo_path = get_local_ontology_path('efo', force=force_download)
     # Ontology for Biomedical Investigations for assays
-    obi_path = ensure_local_ontology('obi', force=force_download)
+    obi_path = get_local_ontology_path('obi', force=force_download)
     # The Cell Line Ontology for cell line information for biosamples
-    clo_path = ensure_local_ontology('clo', force=force_download)
+    clo_path = get_local_ontology_path('clo', force=force_download)
     # Human Disease Ontology for disease
-    doid_path = ensure_local_ontology('doid', force=force_download)
+    doid_path = get_local_ontology_path('doid', force=force_download)
     # The Human Phenotype Ontology (HPO) for disease
-    hp_path = ensure_local_ontology('hp', force=force_download)
+    hp_path = get_local_ontology_path('hp', force=force_download)
     # Mondo Disease Ontology for disease
-    mondo_path = ensure_local_ontology('mondo', force=force_download)
+    mondo_path = get_local_ontology_path('mondo', force=force_download)
     # Ontology of Biological Attributes covering all kingdoms of life
-    oba_path = ensure_local_ontology('oba', force=force_download)
+    oba_path = get_local_ontology_path('oba', force=force_download)
     # NCI Thesaurus
-    ncit_path = ensure_local_ontology('ncit', force=force_download)
+    ncit_path = get_local_ontology_path('ncit', force=force_download)
     # Provisional Cell Ontology
-    pcl_path = ensure_local_ontology('pcl', force=force_download)
+    pcl_path = get_local_ontology_path('pcl', force=force_download)
     # Gene Ontology
-    go_path = ensure_local_ontology('go', force=force_download)
+    go_path = get_local_ontology_path('go', force=force_download)
 
     whitelist = [uberon_path, cl_path, efo_path, obi_path, doid_path, hp_path, mondo_path, oba_path, ncit_path, pcl_path, go_path]
     
