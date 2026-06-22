@@ -272,6 +272,50 @@ def getTermId(term):
     return term_string
 
 
+# Term prefixes that must take name/definition only from their own OWL file.
+METADATA_AUTHORITY = {
+    'CL': 'cl',
+    'GO': 'go',
+    'HP': 'hp',
+    'NCIT': 'ncit',
+    'UBERON': 'uberon',
+    'CLO': 'clo',
+    'OBA': 'oba',
+    'OBI': 'obi',
+}
+
+
+def can_set_metadata(term_id, ontology_key):
+    """Return True if this file may set name/definition for term_id."""
+    if ':' not in term_id:
+        return True
+    prefix = term_id.split(':', 1)[0]
+    authority = METADATA_AUTHORITY.get(prefix)
+    if authority is None:
+        return True
+    return authority == ontology_key
+
+
+def apply_term_metadata(terms, term_id, data, label_subject, ontology_key):
+    """Set name/definition/preferred_name according to namespace authority rules."""
+    if not can_set_metadata(term_id, ontology_key):
+        return
+
+    prefix = term_id.split(':', 1)[0] if ':' in term_id else None
+    if term_id in data.definitions:
+        if prefix in METADATA_AUTHORITY:
+            terms[term_id]['definition'] = data.definitions[term_id]
+        elif not terms[term_id].get('definition'):
+            terms[term_id]['definition'] = data.definitions[term_id]
+
+    label = str(data.rdf_graph.value(label_subject, namespace.RDFS.label, default=''))
+    if label:
+        terms[term_id]['name'] = label
+
+    if PREFERRED_NAME.get(term_id):
+        terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
+
+
 def getAncestors(parents, terms, key):
     visited = []
     queue = parents.copy()
@@ -399,12 +443,24 @@ def main(argv=None):
     # Gene Ontology
     go_path = get_local_ontology_path('go', force=force_download)
 
-    whitelist = [uberon_path, cl_path, efo_path, obi_path, doid_path, hp_path, mondo_path, oba_path, ncit_path, pcl_path, go_path]
+    whitelist = [
+        ('uberon', uberon_path),
+        ('cl', cl_path),
+        ('efo', efo_path),
+        ('obi', obi_path),
+        ('doid', doid_path),
+        ('hp', hp_path),
+        ('mondo', mondo_path),
+        ('oba', oba_path),
+        ('ncit', ncit_path),
+        ('pcl', pcl_path),
+        ('go', go_path),
+    ]
     
     print("Generating ontology file...")
     terms = {}
     # Run on ontologies defined in whitelist
-    for path in whitelist:
+    for ontology_key, path in whitelist:
         print("Processing file from:", path)
         data = Inspector(path)
         for c in data.allclasses:
@@ -422,35 +478,24 @@ def main(argv=None):
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
-                                        if term_id in data.definitions and not terms[term_id].get('definition'):
-                                            terms[term_id]['definition'] = data.definitions[term_id]
-                                            if str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default='')):
-                                                terms[term_id]['name'] = str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default=''))
-                                            if PREFERRED_NAME.get(term_id):
-                                                terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
+                                        apply_term_metadata(
+                                            terms, term_id, data, collection[0], ontology_key
+                                        )
                                         terms[term_id]['part_of'] = terms[term_id].get('part_of', []) + [getTermId(subC)]
                                 elif DEVELOPS_FROM in col_list:
                                     for subC in data.rdf_graph.objects(c, RDFS.subClassOf):
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
-                                        if term_id in data.definitions and not terms[term_id].get('definition'):
-                                            terms[term_id]['definition'] = data.definitions[term_id]
-                                            if str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default='')):
-                                                terms[term_id]['name'] = str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default=''))
-                                            if PREFERRED_NAME.get(term_id):
-                                                terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
+                                        apply_term_metadata(
+                                            terms, term_id, data, collection[0], ontology_key
+                                        )
                                         terms[term_id]['develops_from'] = terms[term_id].get('develops_from', []) + [getTermId(subC)]
             else:
                 term_id = getTermId(c)
                 if term_id not in terms:
                     terms[term_id] = {}
-                if term_id in data.definitions and not terms[term_id].get('definition'):
-                    terms[term_id]['definition'] = data.definitions[term_id]
-                if str(data.rdf_graph.value(c, namespace.RDFS.label, default='')):
-                    terms[term_id]['name'] = str(data.rdf_graph.value(c, namespace.RDFS.label, default=''))
-                if PREFERRED_NAME.get(term_id):
-                    terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
+                apply_term_metadata(terms, term_id, data, c, ontology_key)
                 # Get all parents
                 for parent in data.get_classDirectSupers(c, excludeBnodes=False):
                     if type(parent) == BNode:
@@ -507,12 +552,7 @@ def main(argv=None):
                 terms[term_id] = {}
                 if term_id in data.comments:
                     terms[term_id]['comments'] = data.comments[term_id]
-                if str(data.rdf_graph.value(c, namespace.RDFS.label, default='')):
-                    terms[term_id]['name'] = str(data.rdf_graph.value(c, namespace.RDFS.label, default=''))
-                if PREFERRED_NAME.get(term_id):
-                    terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
-            if term_id in data.definitions and not terms[term_id].get('definition'):
-                terms[term_id]['definition'] = data.definitions[term_id]
+            apply_term_metadata(terms, term_id, data, c, 'clo')
             synonyms = data.getSynonyms(c)
             if synonyms:
                 terms[term_id]['synonyms'] = list(set(terms[term_id].get('synonyms', []) + synonyms))
