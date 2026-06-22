@@ -5,7 +5,9 @@ from rdflib import ConjunctiveGraph, Namespace
 from rdflib import RDFS, RDF, BNode, OWL
 from rdflib.collection import Collection
 from rdflib import namespace
+import argparse
 import json
+import os
 from datetime import date
 from ontology.ntr_terms import (
     ntr_assays,
@@ -34,11 +36,31 @@ OWL_DEPRECATED = OWL['deprecated']
 OBOINOWL_OBSOLETE_CLASS = OBO_OWL['ObsoleteClass']
 
 
+def get_ontology_files_dir():
+    """Return repo-root ontology_files/ (works when installed in site-packages)."""
+    for start in (os.getcwd(), os.path.dirname(__file__)):
+        path = os.path.abspath(start)
+        while True:
+            if os.path.isfile(os.path.join(path, 'setup.py')):
+                return os.path.join(path, 'ontology_files')
+            parent = os.path.dirname(path)
+            if parent == path:
+                break
+            path = parent
+
+    return os.path.join(os.getcwd(), 'ontology_files')
+
+
 ONTOLOGY_ASSET_DICT = {
     'uberon': {
         'ontology_repo': 'obophenotype/uberon',
         'asset_name': 'composite-metazoan.owl',
         'uri': 'http://purl.obolibrary.org/obo/uberon.owl'
+    },
+    'cl': {
+        'ontology_repo': 'obophenotype/cell-ontology',
+        'asset_name': 'cl.owl',
+        'uri': 'http://purl.obolibrary.org/obo/cl.owl'
     },
     'efo': {
         'ontology_repo': 'EBISPOT/efo',
@@ -250,6 +272,50 @@ def getTermId(term):
     return term_string
 
 
+# Term prefixes that must take name/definition only from their own OWL file.
+METADATA_AUTHORITY = {
+    'CL': 'cl',
+    'GO': 'go',
+    'HP': 'hp',
+    'NCIT': 'ncit',
+    'UBERON': 'uberon',
+    'CLO': 'clo',
+    'OBA': 'oba',
+    'OBI': 'obi',
+}
+
+
+def can_set_metadata(term_id, ontology_key):
+    """Return True if this file may set name/definition for term_id."""
+    if ':' not in term_id:
+        return True
+    prefix = term_id.split(':', 1)[0]
+    authority = METADATA_AUTHORITY.get(prefix)
+    if authority is None:
+        return True
+    return authority == ontology_key
+
+
+def apply_term_metadata(terms, term_id, data, label_subject, ontology_key):
+    """Set name/definition/preferred_name according to namespace authority rules."""
+    if not can_set_metadata(term_id, ontology_key):
+        return
+
+    prefix = term_id.split(':', 1)[0] if ':' in term_id else None
+    if term_id in data.definitions:
+        if prefix in METADATA_AUTHORITY:
+            terms[term_id]['definition'] = data.definitions[term_id]
+        elif not terms[term_id].get('definition'):
+            terms[term_id]['definition'] = data.definitions[term_id]
+
+    label = str(data.rdf_graph.value(label_subject, namespace.RDFS.label, default=''))
+    if label:
+        terms[term_id]['name'] = label
+
+    if PREFERRED_NAME.get(term_id):
+        terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
+
+
 def getAncestors(parents, terms, key):
     visited = []
     queue = parents.copy()
@@ -301,45 +367,102 @@ def get_downLoad_url(owl_file_name):
     print(asset_name + ':', download_url)
     if data:
         print('release name: ' + data['name'])
-        print('release tag: ' + data['tag_name'] + '\n')
+        print('release tag: ' + data['tag_name'])
     else:
-        print('release info: not available \n')
+        print('release info: not available')
 
     return download_url
 
 
-def main():
-    # Uberon multi-species anatomy ontology for biosample
-    uberon_url = get_downLoad_url('uberon')
-    # The Experimental Factor Ontology (EFO) for biosample
-    efo_url = get_downLoad_url('efo')
-    # Ontology for Biomedical Investigations for assays
-    obi_url = get_downLoad_url('obi')
-    # The Cell Line Ontology for cell line information for biosamples
-    clo_url = get_downLoad_url('clo')
-    # Human Disease Ontology for disease
-    doid_url = get_downLoad_url('doid')
-    # The Human Phenotype Ontology (HPO) for disease
-    hp_url = get_downLoad_url('hp')
-    # Mondo Disease Ontology for disease
-    mondo_url = get_downLoad_url('mondo')
-    # Ontology of Biological Attributes covering all kingdoms of life
-    oba_url = get_downLoad_url('oba')
-    # NCI Thesaurus
-    ncit_url = get_downLoad_url('ncit')
-    # Provisional Cell Ontology
-    pcl_url = get_downLoad_url('pcl')
-    # Gene Ontology
-    go_url = get_downLoad_url('go')
+def get_local_ontology_path(owl_file_name, force=False):
+    """Return a local path to an OWL file, downloading it when not cached."""
+    url = get_downLoad_url(owl_file_name)
+    asset_name = ONTOLOGY_ASSET_DICT[owl_file_name]['asset_name']
+    if not asset_name:
+        asset_name = owl_file_name + '.owl'
+    local_path = os.path.join(get_ontology_files_dir(), asset_name)
 
-    whitelist = [uberon_url, efo_url, obi_url, doid_url, hp_url, mondo_url, oba_url, ncit_url, pcl_url, go_url]
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    if os.path.isfile(local_path) and not force:
+        print(f"Using cached file: {local_path}\n")
+        return local_path
+
+    print(f"Downloading {url}")
+    print(f"Saving to {local_path}\n")
+    response = requests.get(url, stream=True, timeout=600)
+    response.raise_for_status()
+    with open(local_path, 'wb') as outfile:
+        for chunk in response.iter_content(chunk_size=1024 * 1024):
+            if chunk:
+                outfile.write(chunk)
+    return local_path
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(
+        description='Generate ontology JSON from OWL release files.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""Examples:
+  %(prog)s
+  %(prog)s --force-download""",
+    )
+    parser.add_argument(
+        '--force-download',
+        action='store_true',
+        help='Re-download OWL files even when cached copies exist in ontology_files/.',
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    force_download = args.force_download
+
+    # Uberon multi-species anatomy ontology for biosample
+    uberon_path = get_local_ontology_path('uberon', force=force_download)
+    # Cell Ontology (loaded after composite-metazoan for fresher CL terms)
+    cl_path = get_local_ontology_path('cl', force=force_download)
+    # The Experimental Factor Ontology (EFO) for biosample
+    efo_path = get_local_ontology_path('efo', force=force_download)
+    # Ontology for Biomedical Investigations for assays
+    obi_path = get_local_ontology_path('obi', force=force_download)
+    # The Cell Line Ontology for cell line information for biosamples
+    clo_path = get_local_ontology_path('clo', force=force_download)
+    # Human Disease Ontology for disease
+    doid_path = get_local_ontology_path('doid', force=force_download)
+    # The Human Phenotype Ontology (HPO) for disease
+    hp_path = get_local_ontology_path('hp', force=force_download)
+    # Mondo Disease Ontology for disease
+    mondo_path = get_local_ontology_path('mondo', force=force_download)
+    # Ontology of Biological Attributes covering all kingdoms of life
+    oba_path = get_local_ontology_path('oba', force=force_download)
+    # NCI Thesaurus
+    ncit_path = get_local_ontology_path('ncit', force=force_download)
+    # Provisional Cell Ontology
+    pcl_path = get_local_ontology_path('pcl', force=force_download)
+    # Gene Ontology
+    go_path = get_local_ontology_path('go', force=force_download)
+
+    whitelist = [
+        ('uberon', uberon_path),
+        ('cl', cl_path),
+        ('efo', efo_path),
+        ('obi', obi_path),
+        ('doid', doid_path),
+        ('hp', hp_path),
+        ('mondo', mondo_path),
+        ('oba', oba_path),
+        ('ncit', ncit_path),
+        ('pcl', pcl_path),
+        ('go', go_path),
+    ]
     
     print("Generating ontology file...")
     terms = {}
     # Run on ontologies defined in whitelist
-    for url in whitelist:
-        print("Processing file from:", url)
-        data = Inspector(url)
+    for ontology_key, path in whitelist:
+        print("Processing file from:", path)
+        data = Inspector(path)
         for c in data.allclasses:
             if type(c) == BNode:
                 for o in data.rdf_graph.objects(c, RDFS.subClassOf):
@@ -355,35 +478,24 @@ def main():
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
-                                        if term_id in data.definitions and not terms[term_id].get('definition'):
-                                            terms[term_id]['definition'] = data.definitions[term_id]
-                                            if str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default='')):
-                                                terms[term_id]['name'] = str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default=''))
-                                            if PREFERRED_NAME.get(term_id):
-                                                terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
+                                        apply_term_metadata(
+                                            terms, term_id, data, collection[0], ontology_key
+                                        )
                                         terms[term_id]['part_of'] = terms[term_id].get('part_of', []) + [getTermId(subC)]
                                 elif DEVELOPS_FROM in col_list:
                                     for subC in data.rdf_graph.objects(c, RDFS.subClassOf):
                                         term_id = getTermId(collection[0])
                                         if term_id not in terms:
                                             terms[term_id] = {}
-                                        if term_id in data.definitions and not terms[term_id].get('definition'):
-                                            terms[term_id]['definition'] = data.definitions[term_id]
-                                            if str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default='')):
-                                                terms[term_id]['name'] = str(data.rdf_graph.value(collection[0], namespace.RDFS.label, default=''))
-                                            if PREFERRED_NAME.get(term_id):
-                                                terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
+                                        apply_term_metadata(
+                                            terms, term_id, data, collection[0], ontology_key
+                                        )
                                         terms[term_id]['develops_from'] = terms[term_id].get('develops_from', []) + [getTermId(subC)]
             else:
                 term_id = getTermId(c)
                 if term_id not in terms:
                     terms[term_id] = {}
-                if term_id in data.definitions and not terms[term_id].get('definition'):
-                    terms[term_id]['definition'] = data.definitions[term_id]
-                if str(data.rdf_graph.value(c, namespace.RDFS.label, default='')):
-                    terms[term_id]['name'] = str(data.rdf_graph.value(c, namespace.RDFS.label, default=''))
-                if PREFERRED_NAME.get(term_id):
-                    terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
+                apply_term_metadata(terms, term_id, data, c, ontology_key)
                 # Get all parents
                 for parent in data.get_classDirectSupers(c, excludeBnodes=False):
                     if type(parent) == BNode:
@@ -431,8 +543,8 @@ def main():
                     terms[term_id]['synonyms'] = list(set(terms[term_id].get('synonyms', []) + synonyms))
 
     # Get only CLO terms from the CLO owl file
-    print("Processing file from:", clo_url)
-    data = Inspector(clo_url, comments=True)
+    print("Processing file from:", clo_path)
+    data = Inspector(clo_path, comments=True)
     for c in data.allclasses:
         if c.startswith('http://purl.obolibrary.org/obo/CLO'):
             term_id = getTermId(c)
@@ -440,12 +552,7 @@ def main():
                 terms[term_id] = {}
                 if term_id in data.comments:
                     terms[term_id]['comments'] = data.comments[term_id]
-                if str(data.rdf_graph.value(c, namespace.RDFS.label, default='')):
-                    terms[term_id]['name'] = str(data.rdf_graph.value(c, namespace.RDFS.label, default=''))
-                if PREFERRED_NAME.get(term_id):
-                    terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
-            if term_id in data.definitions and not terms[term_id].get('definition'):
-                terms[term_id]['definition'] = data.definitions[term_id]
+            apply_term_metadata(terms, term_id, data, c, 'clo')
             synonyms = data.getSynonyms(c)
             if synonyms:
                 terms[term_id]['synonyms'] = list(set(terms[term_id].get('synonyms', []) + synonyms))

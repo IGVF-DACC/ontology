@@ -1,0 +1,13 @@
+ontology_files/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+venv/
+
+# macOS / editor
+.DS_Store
+.vscode/
