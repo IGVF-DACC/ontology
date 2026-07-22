@@ -198,7 +198,7 @@ def download_ontology_file(url: str, local_path: str) -> str:
     return local_path
 
 
-def build_file_metadata(release_info: dict) -> dict:
+def build_file_metadata(release_info: dict, local_path: str) -> dict:
     """Build IGVF-style file metadata for one ontology file."""
     version = release_info.get('version')
     if not version:
@@ -213,6 +213,7 @@ def build_file_metadata(release_info: dict) -> dict:
         'source_url': release_info['source_url'],
         'version': version,
         'controlled_access': False,
+        'submitted_file_name': local_path,
     }
 
 
@@ -265,7 +266,7 @@ def main(argv=None):
         local_path = os.path.join(files_dir, release_info['local_file_name'])
         if not args.dry_run:
             download_ontology_file(release_info['download_url'], local_path)
-        metadata_by_ontology[key] = build_file_metadata(release_info)
+        metadata_by_ontology[key] = build_file_metadata(release_info, local_path)
 
     today = date.today().isoformat()
     output_path = args.output or f'ontology_files_metadata-{today}.json'
