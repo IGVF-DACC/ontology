@@ -68,6 +68,7 @@ def get_release_info(owl_file_name: str) -> dict:
     if not version:
         print(f'No version found for {owl_file_name}. Using HTTP Last-Modified.')
         version = get_http_last_modified_version(download_url)
+    version = format_version(version)
 
     print(f'{local_file_name}: {download_url}')
     if version:
@@ -79,6 +80,7 @@ def get_release_info(owl_file_name: str) -> dict:
         'source_url': source_url,
         'download_url': download_url,
         'version': version,
+        'file_set': asset['file_set'],
     }
 
 
@@ -198,20 +200,24 @@ def download_ontology_file(url: str, local_path: str) -> str:
     return local_path
 
 
+def format_version(version: str) -> str:
+    """Ensure version strings are prefixed with 'v' (e.g. v2026-06-23)."""
+    version = version.strip()
+    if version.startswith('v') or version.startswith('V'):
+        return 'v' + version[1:]
+    return f'v{version}'
+
+
 def build_file_metadata(release_info: dict, local_path: str) -> dict:
     """Build IGVF-style file metadata for one ontology file."""
-    version = release_info.get('version')
-    if not version:
-        print(f'No version found for {release_info["local_file_name"]}. Using today\'s date.')
-        version = f'{date.today().isoformat()}'
-
     return {
         'content_type': 'ontology terms',
         'file_format': file_format_from_name(release_info['local_file_name']),
         'award': DEFAULT_AWARD,
         'lab': DEFAULT_LAB,
+        'file_set': release_info['file_set'],
         'source_url': release_info['source_url'],
-        'version': version,
+        'version': release_info['version'],
         'controlled_access': False,
         'submitted_file_name': local_path,
     }

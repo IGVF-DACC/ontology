@@ -23,72 +23,86 @@ ONTOLOGY_ASSET_DICT = {
         'local_file_name': 'uberon.owl',
         'uri': 'http://purl.obolibrary.org/obo/uberon.owl',
         'ols_id': 'uberon',
+        'file_set': 'IGVFDS2035XPMB',
     },
     'cl': {
         'local_file_name': 'cl.owl',
         'uri': 'http://purl.obolibrary.org/obo/cl.owl',
         'ols_id': 'cl',
+        'file_set': 'IGVFDS2588RYXK',
     },
     'efo': {
         'local_file_name': 'efo.owl',
         'uri': 'http://www.ebi.ac.uk/efo/efo.owl',
         'ols_id': 'efo',
+        'file_set': 'IGVFDS6003FOMG',
     },
     'mondo': {
         'local_file_name': 'mondo.owl',
         'uri': 'http://purl.obolibrary.org/obo/mondo.owl',
         'ols_id': 'mondo',
+        'file_set': 'IGVFDS7295JLJQ',
     },
     'oba': {
         'local_file_name': 'oba.owl',
         'uri': 'http://purl.obolibrary.org/obo/oba.owl',
         'ols_id': 'oba',
+        'file_set': 'IGVFDS0967KVGP',
     },
     'obi': {
         'local_file_name': 'obi.owl',
         'uri': 'http://purl.obolibrary.org/obo/obi.owl',
         'ols_id': 'obi',
+        'file_set': 'IGVFDS2602QLHH',
     },
     'clo': {
         'local_file_name': 'clo.owl',
         'uri': 'http://purl.obolibrary.org/obo/clo.owl',
         'ols_id': 'clo',
+        'file_set': 'IGVFDS7562BUEW',
     },
     'doid': {
         'local_file_name': 'doid.owl',
         'uri': 'http://purl.obolibrary.org/obo/doid.owl',
         'ols_id': 'doid',
+        'file_set': 'IGVFDS0076IZRZ',
     },
     'hp': {
         'local_file_name': 'hp.owl',
         'uri': 'http://purl.obolibrary.org/obo/hp.owl',
         'ols_id': 'hp',
+        'file_set': 'IGVFDS5350TOZO',
     },
     'ncit': {
         'local_file_name': 'ncit.owl',
         'uri': 'http://purl.obolibrary.org/obo/ncit.owl',
         'ols_id': 'ncit',
+        'file_set': 'IGVFDS6069UIHS',
     },
     'pcl': {
         'local_file_name': 'pcl.owl',
         'uri': 'http://purl.obolibrary.org/obo/pcl.owl',
         'ols_id': 'pcl',
+        'file_set': 'IGVFDS4687SYMS',
     },
     'go': {
         'local_file_name': 'go.owl',
         'uri': 'https://purl.obolibrary.org/obo/go.owl',
         'ols_id': 'go',
+        'file_set': 'IGVFDS9239KXAX',
     },
     'chebi': {
         'local_file_name': 'chebi.owl',
         'uri': 'http://purl.obolibrary.org/obo/chebi.owl',
         'ols_id': 'chebi',
+        'file_set': 'IGVFDS0762GKJU',
         'catalog_only': True,
     },
     'vario': {
         'local_file_name': 'vario.owl',
         'uri': 'http://purl.obolibrary.org/obo/vario.owl',
         'ols_id': 'vario',
+        'file_set': 'IGVFDS3622SSGR',
         'catalog_only': True,
     },
     'orphanet': {
@@ -96,6 +110,7 @@ ONTOLOGY_ASSET_DICT = {
         'local_file_name': 'ordo_orphanet.owl',
         'uri': 'https://www.orphadata.com/data/ontologies/ordo/last_version/ordo_orphanet.owl',
         'ols_id': 'ordo',
+        'file_set': 'IGVFDS9088SLTK',
         'catalog_only': True,
     },
     'cellosaurus': {
@@ -103,10 +118,10 @@ ONTOLOGY_ASSET_DICT = {
         'local_file_name': 'cellosaurus.obo',
         'uri': 'https://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo',
         'ols_id': None,
+        'file_set': 'IGVFDS3922HDSH',
         'catalog_only': True,
     },
 }
-
 
 
 def get_ols_ontology_id(ontology_key: str):
