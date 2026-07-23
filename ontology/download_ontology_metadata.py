@@ -5,6 +5,8 @@ Uses shared source config from ontology.ontology_assets.
 
 Download:
   Always use ONTOLOGY_ASSET_DICT uri (OBO PURL or other canonical URL).
+  Saves both the raw ontology file and a gzipped copy (*.owl.gz / *.obo.gz).
+  Metadata submitted_file_name points at the gzipped file for portal upload.
 
 Version:
   1. Cellosaurus: https://api.cellosaurus.org/release-info
@@ -24,9 +26,11 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import os
 import re
+import shutil
 from datetime import date, datetime, timezone
 from email.utils import parsedate_to_datetime
 
@@ -190,7 +194,7 @@ def download_ontology_file(url: str, local_path: str) -> str:
     """Download url and overwrite local_path."""
     os.makedirs(os.path.dirname(local_path), exist_ok=True)
     print(f'Downloading {url}')
-    print(f'Saving to {local_path}\n')
+    print(f'Saving to {local_path}')
     response = requests.get(url, stream=True, timeout=600)
     response.raise_for_status()
     with open(local_path, 'wb') as outfile:
@@ -198,6 +202,15 @@ def download_ontology_file(url: str, local_path: str) -> str:
             if chunk:
                 outfile.write(chunk)
     return local_path
+
+
+def gzip_ontology_file(local_path: str) -> str:
+    """Write a gzipped copy next to local_path (e.g. cl.owl -> cl.owl.gz)."""
+    gzip_path = f'{local_path}.gz'
+    print(f'Gzipping {local_path} -> {gzip_path}\n')
+    with open(local_path, 'rb') as src, gzip.open(gzip_path, 'wb') as dst:
+        shutil.copyfileobj(src, dst, length=1024 * 1024)
+    return gzip_path
 
 
 def format_version(version: str) -> str:
@@ -208,7 +221,7 @@ def format_version(version: str) -> str:
     return f'v{version}'
 
 
-def build_file_metadata(release_info: dict, local_path: str) -> dict:
+def build_file_metadata(release_info: dict, submitted_file_name: str) -> dict:
     """Build IGVF-style file metadata for one ontology file."""
     return {
         'content_type': 'ontology terms',
@@ -219,7 +232,7 @@ def build_file_metadata(release_info: dict, local_path: str) -> dict:
         'source_url': release_info['source_url'],
         'version': release_info['version'],
         'controlled_access': False,
-        'submitted_file_name': local_path,
+        'submitted_file_name': submitted_file_name,
     }
 
 
@@ -270,9 +283,11 @@ def main(argv=None):
         print(f'=== {key} ===')
         release_info = get_release_info(key)
         local_path = os.path.join(files_dir, release_info['local_file_name'])
+        gzip_path = f'{local_path}.gz'
         if not args.dry_run:
             download_ontology_file(release_info['download_url'], local_path)
-        metadata_by_ontology[key] = build_file_metadata(release_info, local_path)
+            gzip_ontology_file(local_path)
+        metadata_by_ontology[key] = build_file_metadata(release_info, gzip_path)
 
     today = date.today().isoformat()
     output_path = args.output or f'ontology_files_metadata-{today}.json'
