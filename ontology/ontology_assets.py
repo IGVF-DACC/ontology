@@ -18,6 +18,12 @@ def get_ontology_files_dir():
     return os.path.join(os.getcwd(), 'ontology_files')
 
 
+def get_igvf_portal_ontology_files_dir():
+    """Return repo-root ontology_files_from_igvf_portal/ cache directory."""
+    repo_root = os.path.dirname(get_ontology_files_dir())
+    return os.path.join(repo_root, 'ontology_files_from_igvf_portal')
+
+
 ONTOLOGY_ASSET_DICT = {
     'uberon': {
         'local_file_name': 'uberon.owl',
@@ -56,10 +62,12 @@ ONTOLOGY_ASSET_DICT = {
         'file_set': 'IGVFDS2602QLHH',
     },
     'clo': {
+        # Downloaded for generation, but processed in a dedicated CLO-only pass.
         'local_file_name': 'clo.owl',
         'uri': 'http://purl.obolibrary.org/obo/clo.owl',
         'ols_id': 'clo',
         'file_set': 'IGVFDS7562BUEW',
+        'in_whitelist': False,
     },
     'doid': {
         'local_file_name': 'doid.owl',
@@ -124,6 +132,24 @@ ONTOLOGY_ASSET_DICT = {
 }
 
 
+# Term prefixes that must take name/definition only from their own ontology file.
+# Only includes ontologies loaded by generate_ontology (not catalog_only).
+METADATA_AUTHORITY = {
+    'UBERON': 'uberon',
+    'CL': 'cl',
+    'EFO': 'efo',
+    'MONDO': 'mondo',
+    'OBA': 'oba',
+    'OBI': 'obi',
+    'CLO': 'clo',
+    'DOID': 'doid',
+    'HP': 'hp',
+    'NCIT': 'ncit',
+    'PCL': 'pcl',
+    'GO': 'go',
+}
+
+
 def get_ols_ontology_id(ontology_key: str):
     """Return OLS ontology id for ontology_key, or None if not in OLS."""
     return ONTOLOGY_ASSET_DICT[ontology_key].get('ols_id')
@@ -135,9 +161,13 @@ def is_catalog_only(ontology_key: str) -> bool:
 
 
 def generation_ontology_keys():
-    """Ontology keys used by generate_ontology (excludes catalog-only assets)."""
+    """Ontology keys used in the main generate_ontology whitelist.
+
+    Excludes catalog-only assets and ontologies handled in dedicated passes
+    (e.g. CLO with in_whitelist=False).
+    """
     return [
         key
-        for key in ONTOLOGY_ASSET_DICT
-        if not is_catalog_only(key)
+        for key, asset in ONTOLOGY_ASSET_DICT.items()
+        if not is_catalog_only(key) and asset.get('in_whitelist', True)
     ]

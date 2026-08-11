@@ -1,4 +1,5 @@
 ontology_files/
+ontology_files_from_igvf_portal/
 
 # Python
 __pycache__/

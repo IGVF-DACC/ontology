@@ -1,13 +1,14 @@
 import requests
-from requests.structures import CaseInsensitiveDict
 from urllib.error import HTTPError
 from rdflib import ConjunctiveGraph, Namespace
 from rdflib import RDFS, RDF, BNode, OWL
 from rdflib.collection import Collection
 from rdflib import namespace
 import argparse
+import gzip
 import json
 import os
+import shutil
 from datetime import date
 from ontology.ntr_terms import (
     ntr_assays,
@@ -15,7 +16,16 @@ from ontology.ntr_terms import (
 )
 from ontology.manual_slims import manual_slims
 from ontology.base_slims import base_slims
+from ontology.ontology_assets import (
+    METADATA_AUTHORITY,
+    ONTOLOGY_ASSET_DICT,
+    generation_ontology_keys,
+    get_igvf_portal_ontology_files_dir,
+    is_catalog_only,
+)
 
+
+IGVF_API_BASE = 'https://api.data.igvf.org'
 
 OBO_OWL = Namespace('http://www.geneontology.org/formats/oboInOwl#')
 OBO = Namespace('http://purl.obolibrary.org/obo/')
@@ -35,85 +45,6 @@ OBOINOWL_DEPRECATED = OBO_OWL['deprecated']
 OWL_DEPRECATED = OWL['deprecated']
 OBOINOWL_OBSOLETE_CLASS = OBO_OWL['ObsoleteClass']
 
-
-def get_ontology_files_dir():
-    """Return repo-root ontology_files/ (works when installed in site-packages)."""
-    for start in (os.getcwd(), os.path.dirname(__file__)):
-        path = os.path.abspath(start)
-        while True:
-            if os.path.isfile(os.path.join(path, 'setup.py')):
-                return os.path.join(path, 'ontology_files')
-            parent = os.path.dirname(path)
-            if parent == path:
-                break
-            path = parent
-
-    return os.path.join(os.getcwd(), 'ontology_files')
-
-
-ONTOLOGY_ASSET_DICT = {
-    'uberon': {
-        'ontology_repo': 'obophenotype/uberon',
-        'asset_name': 'composite-metazoan.owl',
-        'uri': 'http://purl.obolibrary.org/obo/uberon.owl'
-    },
-    'cl': {
-        'ontology_repo': 'obophenotype/cell-ontology',
-        'asset_name': 'cl.owl',
-        'uri': 'http://purl.obolibrary.org/obo/cl.owl'
-    },
-    'efo': {
-        'ontology_repo': 'EBISPOT/efo',
-        'asset_name': 'efo.owl',
-        'uri': 'http://www.ebi.ac.uk/efo/efo.owl'
-    },
-    'mondo': {
-        'ontology_repo': 'monarch-initiative/mondo',
-        'asset_name': 'mondo.owl',
-        'uri': 'http://purl.obolibrary.org/obo/mondo.owl'
-    },
-    'oba': {
-        'ontology_repo': 'obophenotype/bio-attribute-ontology',
-        'asset_name': 'oba.owl',
-        'uri': 'http://purl.obolibrary.org/obo/oba.owl'
-    },
-    'obi': {
-        'ontology_repo': 'obi-ontology/obi',
-        'asset_name': 'obi.owl',
-        'uri': 'http://purl.obolibrary.org/obo/obi.owl'
-    },
-    'clo': {
-        'ontology_repo': 'CLO-ontology/CLO',
-        'asset_name': 'clo.owl',
-        'uri': 'http://purl.obolibrary.org/obo/clo.owl'
-    },
-    'doid': {
-        'ontology_repo': 'DiseaseOntology/HumanDiseaseOntology',
-        'asset_name': 'doid.owl',
-        'uri': 'http://purl.obolibrary.org/obo/doid.owl'
-    },
-    'hp': {
-        'ontology_repo': 'obophenotype/human-phenotype-ontology',
-        'asset_name': 'hp.owl',
-        'uri': 'http://purl.obolibrary.org/obo/hp.owl'
-    },
-    'ncit': {
-        'ontology_repo': 'ncit-obo-org/ncit-obo-edition',
-        'asset_name': 'ncit.owl',
-        'uri': 'http://purl.obolibrary.org/obo/ncit.owl'
-    },
-    'pcl': {
-        'ontology_repo': 'obophenotype/provisional_cell_ontology',
-        'asset_name': 'pcl.owl',
-        'uri': 'http://purl.obolibrary.org/obo/pcl.owl'
-    },
-    'go': {
-        # GO does not host files on their Github. https://github.com/geneontology
-        'ontology_repo': '',
-        'asset_name': '',
-        'uri': 'https://purl.obolibrary.org/obo/go.owl'
-    }
-}
 
 PREFERRED_NAME = {
     'OBI:0002117': 'WGS',
@@ -148,8 +79,6 @@ PREFERRED_NAME = {
     'OBI:0003033': 'CUT&RUN',
     'OBI:0003034': 'CUT&Tag'
     }
-
-
 
 class Inspector(object):
 
@@ -272,19 +201,6 @@ def getTermId(term):
     return term_string
 
 
-# Term prefixes that must take name/definition only from their own OWL file.
-METADATA_AUTHORITY = {
-    'CL': 'cl',
-    'GO': 'go',
-    'HP': 'hp',
-    'NCIT': 'ncit',
-    'UBERON': 'uberon',
-    'CLO': 'clo',
-    'OBA': 'oba',
-    'OBI': 'obi',
-}
-
-
 def can_set_metadata(term_id, ontology_key):
     """Return True if this file may set name/definition for term_id."""
     if ':' not in term_id:
@@ -344,63 +260,88 @@ def getBaseSlims(term, slimType, slim_candidates):
             return shims_override
     return list(set(base_slim_names))
 
-def get_downLoad_url(owl_file_name):
-    ontology_repo = ONTOLOGY_ASSET_DICT[owl_file_name]['ontology_repo']
-    asset_name = ONTOLOGY_ASSET_DICT[owl_file_name]['asset_name']
-    ontology_url = 'https://api.github.com/repos/' + ontology_repo + '/releases/latest'
-    download_url = None
-    data = None
-    headers = CaseInsensitiveDict()
-    headers['Accept'] = 'application/vnd.github.v3+json'
-    response = requests.get(ontology_url, headers=headers)
-    if response.status_code == 200:    
-        data = response.json()
-        assets = data['assets']
-        if assets:
-            for asset in assets:
-                if asset['name'] == asset_name:
-                    download_url = asset['browser_download_url']
-                    break
-    if not download_url:
-        download_url = ONTOLOGY_ASSET_DICT[owl_file_name]['uri']
-
-    print(asset_name + ':', download_url)
-    if data:
-        print('release name: ' + data['name'])
-        print('release tag: ' + data['tag_name'])
-    else:
-        print('release info: not available')
-
-    return download_url
+def get_igvf_released_file(file_set_accession):
+    """Return the released reference-file object from an IGVF curated set."""
+    url = f'{IGVF_API_BASE}/curated-sets/{file_set_accession}/'
+    response = requests.get(url, timeout=60)
+    response.raise_for_status()
+    files = response.json().get('files') or []
+    released = [f for f in files if f.get('status') == 'released']
+    if not released:
+        raise RuntimeError(
+            f'No released file found in curated set {file_set_accession}'
+        )
+    if len(released) > 1:
+        accessions = ', '.join(f.get('accession', '?') for f in released)
+        raise RuntimeError(
+            f'Expected one released file in curated set {file_set_accession}, '
+            f'found {len(released)}: {accessions}'
+        )
+    return released[0]
 
 
-def get_local_ontology_path(owl_file_name, force=False):
-    """Return a local path to an OWL file, downloading it when not cached."""
-    url = get_downLoad_url(owl_file_name)
-    asset_name = ONTOLOGY_ASSET_DICT[owl_file_name]['asset_name']
-    if not asset_name:
-        asset_name = owl_file_name + '.owl'
-    local_path = os.path.join(get_ontology_files_dir(), asset_name)
+def get_igvf_download_url(file_obj):
+    """Build absolute download URL from an IGVF file object's href."""
+    href = file_obj.get('href')
+    if not href:
+        raise RuntimeError(
+            f"Released file {file_obj.get('accession')} has no href"
+        )
+    if href.startswith('http://') or href.startswith('https://'):
+        return href
+    return IGVF_API_BASE + href
 
+
+def download_and_gunzip_ontology_file(url, local_path):
+    """Download a gzipped ontology file from IGVF and write the unzipped OWL/OBO."""
     os.makedirs(os.path.dirname(local_path), exist_ok=True)
-    if os.path.isfile(local_path) and not force:
-        print(f"Using cached file: {local_path}\n")
-        return local_path
-
-    print(f"Downloading {url}")
-    print(f"Saving to {local_path}\n")
+    gzip_path = local_path + '.gz'
+    print(f'Downloading {url}')
+    print(f'Saving gzip to {gzip_path}')
     response = requests.get(url, stream=True, timeout=600)
     response.raise_for_status()
-    with open(local_path, 'wb') as outfile:
+    with open(gzip_path, 'wb') as outfile:
         for chunk in response.iter_content(chunk_size=1024 * 1024):
             if chunk:
                 outfile.write(chunk)
+
+    print(f'Unzipping to {local_path}\n')
+    with gzip.open(gzip_path, 'rb') as src, open(local_path, 'wb') as dst:
+        shutil.copyfileobj(src, dst, length=1024 * 1024)
     return local_path
+
+
+def get_local_ontology_path(owl_file_name, force=False):
+    """Return local OWL/OBO path from IGVF portal cache, downloading if needed."""
+    if is_catalog_only(owl_file_name):
+        raise ValueError(
+            f'{owl_file_name} is catalog_only and is not used by generate_ontology'
+        )
+
+    asset = ONTOLOGY_ASSET_DICT[owl_file_name]
+    local_file_name = asset['local_file_name']
+    local_path = os.path.join(
+        get_igvf_portal_ontology_files_dir(),
+        local_file_name,
+    )
+
+    if os.path.isfile(local_path) and not force:
+        print(f'Using cached file: {local_path}\n')
+        return local_path
+
+    file_set = asset['file_set']
+    released_file = get_igvf_released_file(file_set)
+    download_url = get_igvf_download_url(released_file)
+    print(
+        f"{local_file_name}: curated set {file_set}, "
+        f"released file {released_file.get('accession')}"
+    )
+    return download_and_gunzip_ontology_file(download_url, local_path)
 
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(
-        description='Generate ontology JSON from OWL release files.',
+        description='Generate ontology JSON from IGVF portal ontology files.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""Examples:
   %(prog)s
@@ -409,7 +350,10 @@ def parse_args(argv=None):
     parser.add_argument(
         '--force-download',
         action='store_true',
-        help='Re-download OWL files even when cached copies exist in ontology_files/.',
+        help=(
+            'Re-download ontology files from the IGVF portal even when cached '
+            'copies exist in ontology_files_from_igvf_portal/.'
+        ),
     )
     return parser.parse_args(argv)
 
@@ -418,45 +362,14 @@ def main(argv=None):
     args = parse_args(argv)
     force_download = args.force_download
 
-    # Uberon multi-species anatomy ontology for biosample
-    uberon_path = get_local_ontology_path('uberon', force=force_download)
-    # Cell Ontology (loaded after composite-metazoan for fresher CL terms)
-    cl_path = get_local_ontology_path('cl', force=force_download)
-    # The Experimental Factor Ontology (EFO) for biosample
-    efo_path = get_local_ontology_path('efo', force=force_download)
-    # Ontology for Biomedical Investigations for assays
-    obi_path = get_local_ontology_path('obi', force=force_download)
-    # The Cell Line Ontology for cell line information for biosamples
-    clo_path = get_local_ontology_path('clo', force=force_download)
-    # Human Disease Ontology for disease
-    doid_path = get_local_ontology_path('doid', force=force_download)
-    # The Human Phenotype Ontology (HPO) for disease
-    hp_path = get_local_ontology_path('hp', force=force_download)
-    # Mondo Disease Ontology for disease
-    mondo_path = get_local_ontology_path('mondo', force=force_download)
-    # Ontology of Biological Attributes covering all kingdoms of life
-    oba_path = get_local_ontology_path('oba', force=force_download)
-    # NCI Thesaurus
-    ncit_path = get_local_ontology_path('ncit', force=force_download)
-    # Provisional Cell Ontology
-    pcl_path = get_local_ontology_path('pcl', force=force_download)
-    # Gene Ontology
-    go_path = get_local_ontology_path('go', force=force_download)
+    whitelist = []
+    for ontology_key in generation_ontology_keys():
+        path = get_local_ontology_path(ontology_key, force=force_download)
+        whitelist.append((ontology_key, path))
 
-    whitelist = [
-        ('uberon', uberon_path),
-        ('cl', cl_path),
-        ('efo', efo_path),
-        ('obi', obi_path),
-        ('doid', doid_path),
-        ('hp', hp_path),
-        ('mondo', mondo_path),
-        ('oba', oba_path),
-        ('ncit', ncit_path),
-        ('pcl', pcl_path),
-        ('go', go_path),
-    ]
-    
+    # CLO is excluded from the main whitelist and handled separately below.
+    clo_path = get_local_ontology_path('clo', force=force_download)
+
     print("Generating ontology file...")
     terms = {}
     # Run on ontologies defined in whitelist
