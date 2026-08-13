@@ -4,9 +4,11 @@
 Uses shared source config from ontology.ontology_assets.
 
 Download:
-  Always use ONTOLOGY_ASSET_DICT uri (OBO PURL or other canonical URL).
-  Saves both the raw ontology file and a gzipped copy (*.owl.gz / *.obo.gz).
-  Metadata submitted_file_name points at the gzipped file for portal upload.
+  Use ONTOLOGY_ASSET_DICT download_uri when set, else uri.
+  ChEBI download_uri is the official .owl.gz; other ontologies are
+  downloaded uncompressed then gzipped locally. Metadata
+  submitted_file_name points at the local *.owl.gz / *.obo.gz.
+  Metadata source_url always uses uri.
 
 Version:
   1. Cellosaurus: https://api.cellosaurus.org/release-info
@@ -53,19 +55,18 @@ def get_release_info(owl_file_name: str) -> dict:
     """Resolve download URL and version metadata for one ontology.
 
     How release info is obtained:
-    1. download_url / source_url: always ONTOLOGY_ASSET_DICT uri
-       (PURL when available, else canonical host such as Orphadata /
-       ExPASy / bioassayontology.org).
+    1. source_url: ONTOLOGY_ASSET_DICT uri
+       download_url: optional download_uri, else uri
+       (BAO: GitHub mirror; ChEBI: official .owl.gz).
     2. version:
        - cellosaurus: GET https://api.cellosaurus.org/release-info
-       - others (including bao via OLS id "bao"): OLS4 version, else
-         parse config.versionIri
+       - others: OLS4 version, else parse config.versionIri
        - fallback: HTTP Last-Modified
     """
     asset = ONTOLOGY_ASSET_DICT[owl_file_name]
     local_file_name = asset['local_file_name']
     source_url = asset['uri']
-    download_url = source_url
+    download_url = asset.get('download_uri') or source_url
 
     if owl_file_name == 'cellosaurus':
         version = get_cellosaurus_version()
@@ -77,6 +78,8 @@ def get_release_info(owl_file_name: str) -> dict:
     version = format_version(version)
 
     print(f'{local_file_name}: {download_url}')
+    if download_url != source_url:
+        print(f'source_url: {source_url}')
     if version:
         print(f'version: {version}')
     print()
@@ -192,18 +195,36 @@ def file_format_from_name(local_file_name: str) -> str:
     return 'owl'
 
 
-def download_ontology_file(url: str, local_path: str) -> str:
-    """Download url and overwrite local_path."""
+def download_ontology_file(url: str, local_path: str) -> bool:
+    """Download url into local_path (uncompressed OWL/OBO).
+
+    If url ends with .gz (ChEBI), save as local_path.gz and gunzip to
+    local_path. Returns True when the .gz was downloaded (skip re-gzip).
+    """
     os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    gzip_path = f'{local_path}.gz'
     print(f'Downloading {url}')
-    print(f'Saving to {local_path}')
+
     response = requests.get(url, stream=True, timeout=600)
     response.raise_for_status()
+
+    if url.rstrip('/').split('?', 1)[0].endswith('.gz'):
+        print(f'Saving gzip to {gzip_path}')
+        with open(gzip_path, 'wb') as outfile:
+            for chunk in response.iter_content(chunk_size=1024 * 1024):
+                if chunk:
+                    outfile.write(chunk)
+        print(f'Gunzipping {gzip_path} -> {local_path}\n')
+        with gzip.open(gzip_path, 'rb') as src, open(local_path, 'wb') as dst:
+            shutil.copyfileobj(src, dst, length=1024 * 1024)
+        return True
+
+    print(f'Saving to {local_path}')
     with open(local_path, 'wb') as outfile:
         for chunk in response.iter_content(chunk_size=1024 * 1024):
             if chunk:
                 outfile.write(chunk)
-    return local_path
+    return False
 
 
 def gzip_ontology_file(local_path: str) -> str:
@@ -215,8 +236,10 @@ def gzip_ontology_file(local_path: str) -> str:
     return gzip_path
 
 
-def format_version(version: str) -> str:
+def format_version(version: str | None) -> str | None:
     """Ensure version strings are prefixed with 'v' (e.g. v2026-06-23)."""
+    if not version:
+        return None
     version = version.strip()
     if version.startswith('v') or version.startswith('V'):
         return 'v' + version[1:]
@@ -287,8 +310,11 @@ def main(argv=None):
         local_path = os.path.join(files_dir, release_info['local_file_name'])
         gzip_path = f'{local_path}.gz'
         if not args.dry_run:
-            download_ontology_file(release_info['download_url'], local_path)
-            gzip_ontology_file(local_path)
+            already_gzipped = download_ontology_file(
+                release_info['download_url'], local_path
+            )
+            if not already_gzipped:
+                gzip_ontology_file(local_path)
         metadata_by_ontology[key] = build_file_metadata(release_info, gzip_path)
 
     today = date.today().isoformat()

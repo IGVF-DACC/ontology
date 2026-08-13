@@ -65,7 +65,7 @@ python -m ontology.download_ontology_metadata -o ontology_files_metadata.json
 
 Behavior:
 
-* Downloads each asset’s `uri` into `ontology_files/`, and writes a gzipped copy (`*.owl.gz` / `*.obo.gz`).
+* Downloads each asset’s `uri` (or `download_uri` when set: BAO GitHub mirror, ChEBI `.owl.gz`). Uncompressed downloads are gzipped locally for portal upload.
 * Writes `ontology_files_metadata-YYYY-MM-DD.json` with per-file portal fields (`content_type`, `file_format`, `award`, `lab`, `file_set`, `source_url`, `version`, `controlled_access`, `submitted_file_name`).
 * Version resolution order:
   1. Cellosaurus: [https://api.cellosaurus.org/release-info](https://api.cellosaurus.org/release-info)
@@ -142,8 +142,8 @@ Resources
 * [NCIT](https://github.com/ncit-obo-org/ncit-obo-edition) — [PURL](http://purl.obolibrary.org/obo/ncit.owl)
 * [PCL](https://obofoundry.org/ontology/pcl.html) — [PURL](http://purl.obolibrary.org/obo/pcl.owl)
 * [GO](https://geneontology.org/) — [PURL](https://purl.obolibrary.org/obo/go.owl)
-* [BAO](http://bioassayontology.org) — [bao_complete.owl](https://www.bioassayontology.org/bao/bao_complete.owl) — [OLS API](https://www.ebi.ac.uk/ols4/api/ontologies/bao)
-* [ChEBI](https://www.ebi.ac.uk/chebi/) — [PURL](http://purl.obolibrary.org/obo/chebi.owl)
+* [BAO](http://bioassayontology.org) — [bao_complete.owl](https://www.bioassayontology.org/bao/bao_complete.owl) (download mirror: [GitHub](https://raw.githubusercontent.com/BioAssayOntology/BAO/master/bao_complete.owl)) — [OLS API](https://www.ebi.ac.uk/ols4/api/ontologies/bao)
+* [ChEBI](https://www.ebi.ac.uk/chebi/) — [PURL](http://purl.obolibrary.org/obo/chebi.owl) (download: [chebi.owl.gz](http://purl.obolibrary.org/obo/chebi.owl.gz))
 * [VariO](https://variationontology.org/) — [PURL](http://purl.obolibrary.org/obo/vario.owl)
 * [Orphanet / ORDO](https://www.orphadata.com/) — [ordo_orphanet.owl](https://www.orphadata.com/data/ontologies/ordo/last_version/ordo_orphanet.owl)
 * [Cellosaurus](https://www.cellosaurus.org/) — [OBO](https://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo) — [release-info API](https://api.cellosaurus.org/release-info)
