@@ -99,6 +99,13 @@ ONTOLOGY_ASSET_DICT = {
         'ols_id': 'go',
         'file_set': 'IGVFDS9239KXAX',
     },
+    'bao': {
+        # Complete BAO OWL; not on OBO PURL. OLS id is "bao".
+        'local_file_name': 'bao_complete.owl',
+        'uri': 'https://www.bioassayontology.org/bao/bao_complete.owl',
+        'ols_id': 'bao',
+        'file_set': "IGVFDS4680UUQJ",
+    },
     'chebi': {
         'local_file_name': 'chebi.owl',
         'uri': 'http://purl.obolibrary.org/obo/chebi.owl',
@@ -147,6 +154,7 @@ METADATA_AUTHORITY = {
     'NCIT': 'ncit',
     'PCL': 'pcl',
     'GO': 'go',
+    'BAO': 'bao',
 }
 
 

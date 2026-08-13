@@ -54,10 +54,12 @@ def get_release_info(owl_file_name: str) -> dict:
 
     How release info is obtained:
     1. download_url / source_url: always ONTOLOGY_ASSET_DICT uri
-       (PURL when available, else canonical host such as Orphadata / ExPASy).
+       (PURL when available, else canonical host such as Orphadata /
+       ExPASy / bioassayontology.org).
     2. version:
        - cellosaurus: GET https://api.cellosaurus.org/release-info
-       - others: OLS4 version, else parse config.versionIri
+       - others (including bao via OLS id "bao"): OLS4 version, else
+         parse config.versionIri
        - fallback: HTTP Last-Modified
     """
     asset = ONTOLOGY_ASSET_DICT[owl_file_name]
