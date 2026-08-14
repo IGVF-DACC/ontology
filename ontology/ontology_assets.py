@@ -99,9 +99,20 @@ ONTOLOGY_ASSET_DICT = {
         'ols_id': 'go',
         'file_set': 'IGVFDS9239KXAX',
     },
+    'bao': {
+        # Complete BAO OWL; not on OBO PURL. OLS id is "bao".
+        # Official host often times out for scripted downloads; use GitHub mirror.
+        'local_file_name': 'bao_complete.owl',
+        'uri': 'https://www.bioassayontology.org/bao/bao_complete.owl',
+        'download_uri': 'https://raw.githubusercontent.com/BioAssayOntology/BAO/master/bao_complete.owl',
+        'ols_id': 'bao',
+        'file_set': 'IGVFDS4680UUQJ',
+    },
     'chebi': {
+        # Full OWL ~826MB; download official .owl.gz (~66MB) instead.
         'local_file_name': 'chebi.owl',
         'uri': 'http://purl.obolibrary.org/obo/chebi.owl',
+        'download_uri': 'http://purl.obolibrary.org/obo/chebi.owl.gz',
         'ols_id': 'chebi',
         'file_set': 'IGVFDS0762GKJU',
         'catalog_only': True,
@@ -147,6 +158,7 @@ METADATA_AUTHORITY = {
     'NCIT': 'ncit',
     'PCL': 'pcl',
     'GO': 'go',
+    'BAO': 'bao',
 }
 
 
