@@ -41,6 +41,7 @@ Catalog-only (download/metadata; not used in generation)
 | vario | vario.owl | [http://purl.obolibrary.org/obo/vario.owl](http://purl.obolibrary.org/obo/vario.owl) | IGVFDS3622SSGR |
 | orphanet | ordo_orphanet.owl | [https://www.orphadata.com/data/ontologies/ordo/last_version/ordo_orphanet.owl](https://www.orphadata.com/data/ontologies/ordo/last_version/ordo_orphanet.owl) | IGVFDS9088SLTK |
 | cellosaurus | cellosaurus.obo | [https://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo](https://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo) | IGVFDS3922HDSH |
+| oncotree | oncotree.json | [https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_latest_stable](https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_latest_stable) | IGVFDS0171BVBY |
 
 Install
 ----------------
@@ -65,12 +66,13 @@ python -m ontology.download_ontology_metadata -o ontology_files_metadata.json
 
 Behavior:
 
-* Downloads each asset’s `uri` (or `download_uri` when set: BAO GitHub mirror, ChEBI `.owl.gz`). Uncompressed downloads are gzipped locally for portal upload.
+* Downloads each asset’s `uri` (or `download_uri` when set: BAO GitHub mirror, ChEBI `.owl.gz`). OWL/OBO downloads are gzipped locally for portal upload; JSON (OncoTree) is left uncompressed.
 * Writes `ontology_files_metadata-YYYY-MM-DD.json` with per-file portal fields (`content_type`, `file_format`, `award`, `lab`, `file_set`, `source_url`, `version`, `controlled_access`, `submitted_file_name`).
 * Version resolution order:
   1. Cellosaurus: [https://api.cellosaurus.org/release-info](https://api.cellosaurus.org/release-info)
-  2. EBI OLS4: [https://www.ebi.ac.uk/ols4/api/ontologies/{ols_id}](https://www.ebi.ac.uk/ols4/api/ontologies/{ols_id}) (`version`, else parse `config.versionIri`)
-  3. Fallback: HTTP `Last-Modified` of the download URL
+  2. OncoTree: [https://oncotree.mskcc.org/api/versions](https://oncotree.mskcc.org/api/versions) (`release_date` of `oncotree_latest_stable`)
+  3. EBI OLS4: [https://www.ebi.ac.uk/ols4/api/ontologies/{ols_id}](https://www.ebi.ac.uk/ols4/api/ontologies/{ols_id}) (`version`, else parse `config.versionIri`)
+  4. Fallback: HTTP `Last-Modified` of the download URL
 * Versions in metadata are prefixed with `v` (e.g. `v2.8.19`, `v2026-06-23`).
 
 Generate combined ontology JSON
@@ -126,6 +128,7 @@ Current versions (from metadata dry-run 2026-08-12)
 * Vario: v2025-02-28
 * Orphanet (ORDO): v4.9
 * Cellosaurus: v56.0
+* OncoTree: v2025-10-03
 
 Resources
 ----------------
@@ -147,5 +150,6 @@ Resources
 * [VariO](https://variationontology.org/) — [PURL](http://purl.obolibrary.org/obo/vario.owl)
 * [Orphanet / ORDO](https://www.orphadata.com/) — [ordo_orphanet.owl](https://www.orphadata.com/data/ontologies/ordo/last_version/ordo_orphanet.owl)
 * [Cellosaurus](https://www.cellosaurus.org/) — [OBO](https://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo) — [release-info API](https://api.cellosaurus.org/release-info)
+* [OncoTree](https://oncotree.mskcc.org/) — [tumorTypes JSON](https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_latest_stable) — [versions API](https://oncotree.mskcc.org/api/versions)
 * [EBI OLS4](https://www.ebi.ac.uk/ols4/) — version metadata for most ontologies
 * [IGVF data portal API](https://api.data.igvf.org/) — curated-set files used by `generate_ontology`

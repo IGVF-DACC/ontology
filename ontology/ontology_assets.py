@@ -140,6 +140,14 @@ ONTOLOGY_ASSET_DICT = {
         'file_set': 'IGVFDS3922HDSH',
         'catalog_only': True,
     },
+    'oncotree': {
+        # Flat JSON list of tumor types. Not in OLS.
+        'local_file_name': 'oncotree.json',
+        'uri': 'https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_latest_stable',
+        'ols_id': None,
+        'file_set': 'IGVFDS0171BVBY',
+        'catalog_only': True,
+    },
 }
 
 

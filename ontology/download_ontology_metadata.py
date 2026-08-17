@@ -5,15 +5,17 @@ Uses shared source config from ontology.ontology_assets.
 
 Download:
   Use ONTOLOGY_ASSET_DICT download_uri when set, else uri.
-  ChEBI download_uri is the official .owl.gz; other ontologies are
-  downloaded uncompressed then gzipped locally. Metadata
-  submitted_file_name points at the local *.owl.gz / *.obo.gz.
-  Metadata source_url always uses uri.
+  ChEBI download_uri is the official .owl.gz; OWL/OBO files are
+  gzipped locally. JSON (OncoTree) is kept uncompressed.
+  Metadata submitted_file_name points at the gzipped OWL/OBO, or
+  the JSON file as-is. Metadata source_url always uses uri.
 
 Version:
   1. Cellosaurus: https://api.cellosaurus.org/release-info
-  2. EBI OLS4 API: version, else parse config.versionIri
-  3. Fallback: HTTP Last-Modified of the download URL
+  2. OncoTree: https://oncotree.mskcc.org/api/versions
+     (release_date of api_identifier oncotree_latest_stable)
+  3. EBI OLS4 API: version, else parse config.versionIri
+  4. Fallback: HTTP Last-Modified of the download URL
 
 Modes:
   default   Resolve release metadata, download OWL files, write metadata JSON
@@ -49,6 +51,8 @@ DEFAULT_AWARD = '/awards/Community/'
 DEFAULT_LAB = '/labs/community/'
 OLS_ONTOLOGY_URL = 'https://www.ebi.ac.uk/ols4/api/ontologies/{ols_id}'
 CELLOSAURUS_RELEASE_INFO_URL = 'https://api.cellosaurus.org/release-info'
+ONCOTREE_VERSIONS_URL = 'https://oncotree.mskcc.org/api/versions'
+ONCOTREE_LATEST_STABLE_ID = 'oncotree_latest_stable'
 
 
 def get_release_info(owl_file_name: str) -> dict:
@@ -60,6 +64,7 @@ def get_release_info(owl_file_name: str) -> dict:
        (BAO: GitHub mirror; ChEBI: official .owl.gz).
     2. version:
        - cellosaurus: GET https://api.cellosaurus.org/release-info
+       - oncotree: GET https://oncotree.mskcc.org/api/versions
        - others: OLS4 version, else parse config.versionIri
        - fallback: HTTP Last-Modified
     """
@@ -70,6 +75,8 @@ def get_release_info(owl_file_name: str) -> dict:
 
     if owl_file_name == 'cellosaurus':
         version = get_cellosaurus_version()
+    elif owl_file_name == 'oncotree':
+        version = get_oncotree_version()
     else:
         version = get_ols_version(owl_file_name)
     if not version:
@@ -111,6 +118,26 @@ def get_cellosaurus_version() -> str | None:
     version = release.get('version')
     if version:
         return str(version).strip() or None
+    return None
+
+
+def get_oncotree_version() -> str | None:
+    """Return OncoTree latest-stable release_date from oncotree.mskcc.org."""
+    try:
+        response = requests.get(ONCOTREE_VERSIONS_URL, timeout=60)
+        if response.status_code != 200:
+            return None
+        data = response.json()
+    except requests.RequestException:
+        return None
+
+    if not isinstance(data, list):
+        return None
+    for item in data:
+        if item.get('api_identifier') == ONCOTREE_LATEST_STABLE_ID:
+            release_date = item.get('release_date')
+            if release_date:
+                return str(release_date).strip() or None
     return None
 
 
@@ -190,7 +217,7 @@ def last_modified_to_date(last_modified: str) -> str | None:
 
 def file_format_from_name(local_file_name: str) -> str:
     ext = os.path.splitext(local_file_name)[1].lstrip('.').lower()
-    if ext in ('owl', 'obo'):
+    if ext in ('owl', 'obo', 'json'):
         return ext
     return 'owl'
 
@@ -309,13 +336,17 @@ def main(argv=None):
         release_info = get_release_info(key)
         local_path = os.path.join(files_dir, release_info['local_file_name'])
         gzip_path = f'{local_path}.gz'
+        is_json = file_format_from_name(release_info['local_file_name']) == 'json'
         if not args.dry_run:
             already_gzipped = download_ontology_file(
                 release_info['download_url'], local_path
             )
-            if not already_gzipped:
+            if not already_gzipped and not is_json:
                 gzip_ontology_file(local_path)
-        metadata_by_ontology[key] = build_file_metadata(release_info, gzip_path)
+        submitted_file_name = local_path if is_json else gzip_path
+        metadata_by_ontology[key] = build_file_metadata(
+            release_info, submitted_file_name
+        )
 
     today = date.today().isoformat()
     output_path = args.output or f'ontology_files_metadata-{today}.json'
