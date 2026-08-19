@@ -6,9 +6,9 @@ Uses shared source config from ontology.ontology_assets.
 Download:
   Use ONTOLOGY_ASSET_DICT download_uri when set, else uri.
   ChEBI download_uri is the official .owl.gz; OWL/OBO files are
-  gzipped locally. JSON (OncoTree) is kept uncompressed.
-  Metadata submitted_file_name points at the gzipped OWL/OBO, or
-  the JSON file as-is. Metadata source_url always uses uri.
+  gzipped locally. JSON files (OncoTree) are packaged as .tar.gz.
+  Metadata submitted_file_name points at the compressed archive.
+  Metadata source_url always uses uri.
 
 Version:
   1. Cellosaurus: https://api.cellosaurus.org/release-info
@@ -35,6 +35,7 @@ import json
 import os
 import re
 import shutil
+import tarfile
 from datetime import date, datetime, timezone
 from email.utils import parsedate_to_datetime
 
@@ -222,6 +223,20 @@ def file_format_from_name(local_file_name: str) -> str:
     return 'owl'
 
 
+def tar_gz_file(local_path: str) -> str:
+    """Create a .tar.gz archive containing local_path (basename only).
+
+    The archive name strips the original extension, e.g.
+    oncotree.json -> oncotree.tar.gz
+    """
+    base_no_ext = os.path.splitext(local_path)[0]
+    tar_path = f'{base_no_ext}.tar.gz'
+    print(f'Creating tar.gz: {tar_path}\n')
+    with tarfile.open(tar_path, 'w:gz') as tar:
+        tar.add(local_path, arcname=os.path.basename(local_path))
+    return tar_path
+
+
 def download_ontology_file(url: str, local_path: str) -> bool:
     """Download url into local_path (uncompressed OWL/OBO).
 
@@ -275,9 +290,12 @@ def format_version(version: str | None) -> str | None:
 
 def build_file_metadata(release_info: dict, submitted_file_name: str) -> dict:
     """Build IGVF-style file metadata for one ontology file."""
+    fmt = file_format_from_name(release_info['local_file_name'])
+    if fmt == 'json':
+        fmt = 'tar'
     return {
         'content_type': 'ontology terms',
-        'file_format': file_format_from_name(release_info['local_file_name']),
+        'file_format': fmt,
         'award': DEFAULT_AWARD,
         'lab': DEFAULT_LAB,
         'file_set': release_info['file_set'],
@@ -336,14 +354,17 @@ def main(argv=None):
         release_info = get_release_info(key)
         local_path = os.path.join(files_dir, release_info['local_file_name'])
         gzip_path = f'{local_path}.gz'
+        tar_gz_path = f'{os.path.splitext(local_path)[0]}.tar.gz'
         is_json = file_format_from_name(release_info['local_file_name']) == 'json'
         if not args.dry_run:
             already_gzipped = download_ontology_file(
                 release_info['download_url'], local_path
             )
-            if not already_gzipped and not is_json:
+            if is_json:
+                tar_gz_file(local_path)
+            elif not already_gzipped:
                 gzip_ontology_file(local_path)
-        submitted_file_name = local_path if is_json else gzip_path
+        submitted_file_name = tar_gz_path if is_json else gzip_path
         metadata_by_ontology[key] = build_file_metadata(
             release_info, submitted_file_name
         )
@@ -366,7 +387,7 @@ def main(argv=None):
     print(f'Ontology files dir: {files_dir}')
     print(f'Files recorded: {len(metadata_by_ontology)}')
     if args.dry_run:
-        print('Dry run: no OWL files were downloaded.')
+        print('Dry run: no ontology files were downloaded.')
 
 
 if __name__ == '__main__':

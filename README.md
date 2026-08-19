@@ -66,7 +66,7 @@ python -m ontology.download_ontology_metadata -o ontology_files_metadata.json
 
 Behavior:
 
-* Downloads each asset’s `uri` (or `download_uri` when set: BAO GitHub mirror, ChEBI `.owl.gz`). OWL/OBO downloads are gzipped locally for portal upload; JSON (OncoTree) is left uncompressed.
+* Downloads each asset’s `uri` (or `download_uri` when set: BAO GitHub mirror, ChEBI `.owl.gz`). OWL/OBO downloads are gzipped locally for portal upload; JSON files (OncoTree) are packaged as `.tar.gz`.
 * Writes `ontology_files_metadata-YYYY-MM-DD.json` with per-file portal fields (`content_type`, `file_format`, `award`, `lab`, `file_set`, `source_url`, `version`, `controlled_access`, `submitted_file_name`).
 * Version resolution order:
   1. Cellosaurus: [https://api.cellosaurus.org/release-info](https://api.cellosaurus.org/release-info)
