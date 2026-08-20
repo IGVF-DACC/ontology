@@ -232,6 +232,15 @@ def apply_term_metadata(terms, term_id, data, label_subject, ontology_key):
         terms[term_id]['preferred_name'] = PREFERRED_NAME.get(term_id)
 
 
+def drop_terms_without_name(terms):
+    """Remove terms that never got a name (retired/missing in their authority OWL)."""
+    for term_id in [
+        tid for tid, entry in terms.items()
+        if not str(entry.get('name') or '').strip()
+    ]:
+        del terms[term_id]
+
+
 def getAncestors(parents, terms, key):
     visited = []
     queue = parents.copy()
@@ -505,6 +514,8 @@ def main(argv=None):
         if ancestors:
             terms[term]['ancestors'] = list(set(ancestors))
         terms[term].pop('closure_with_develops_from', None)
+
+    drop_terms_without_name(terms)
 
     terms.update(ntr_assays)
     terms.update(ntr_biosamples)
