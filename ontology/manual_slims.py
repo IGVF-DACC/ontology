@@ -17,6 +17,7 @@ manual_slims = {
         'OBI:0002117': ['genetic profiling'],  # WGS assay
         'OBI:0000435': ['genetic profiling'],  # Genotyping array
         'OBI:0000626': ['genetic profiling'],  # DNA sequencing assay
+        'OBI:0003133': ['CRISPR screens'],  # cas mediated mutagenesis
         'NTR:0001113': ['CRISPR screens'],  # Immune saturation genome editing
         'OBI:0003659': ['CRISPR screens'],  # in vitro CRISPR screen assay
         'OBI:0003660': ['CRISPR screens'],  # in vitro CRISPR screen using single-cell RNA-seq
@@ -30,8 +31,10 @@ manual_slims = {
         'OBI:0003662': ['multiome'],  # single-nucleus methylcytosine and transcriptome sequencing assay
         'OBI:0002675': ['reporter'],  # MPRA
         'OBI:0002041': ['reporter'],  # STARR-seq
+        'OBI:0002082': ['reporter'],  # LABEL-seq
         'NTR:0001112': ['reporter'],  # Labeling with barcodes and enrichment for biochemical analysis by sequencing
         'OBI:0000288': ['protein'],  # protein-protein interaction detection assay
+        'OBI:0000916': ['protein'],  # flow cytometry assay (VAMP-seq)
         'NTR:0001114': ['protein'],  # Variant abundance by massively parallel sequencing
         'NTR:0001116': ['protein'] # Variant abundance by massively parallel sequencing MultiSTEP
     },
