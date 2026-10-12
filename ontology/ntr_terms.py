@@ -168,6 +168,26 @@ ntr_assays = {
     "NTR:000798": {
         "name": "in vitro CRISPR screen using single-cell ATAC-seq",
         "assay": ["CRISPR screens"]
+    },
+    "NTR:0001112": {
+        "name": "labeling with barcodes and enrichment for biochemical analysis by sequencing",
+        "assay": ["reporter"]
+    },
+    "NTR:0001113": {
+        "name": "immune saturation genome editing",
+        "assay": ["CRISPR screens"]
+    },
+    "NTR:0001114": {
+        "name": "variant abundance by massively parallel sequencing",
+        "assay": ["protein"]
+    },
+    "NTR:0001115": {
+        "name": "saturation genome editing",
+        "assay": ["CRISPR screens"]
+    },
+    "NTR:0001116": {
+        "name": "variant abundance by massively parallel sequencing MultiSTEP",
+        "assay": ["protein"]
     }
 }
 
