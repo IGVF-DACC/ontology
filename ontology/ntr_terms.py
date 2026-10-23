@@ -664,9 +664,6 @@ ntr_biosamples = {
         "organs": ["heart"],
         "cells": ["endothelial cell"],
     },
-    "NTR:0009999": {
-        "name": "xcvxcvxcvcx"
-    },
     "NTR:000781": {
         "name": "extraembryonic endoderm visceral"
     },
