@@ -188,6 +188,14 @@ ntr_assays = {
     "NTR:0001116": {
         "name": "variant abundance by massively parallel sequencing MultiSTEP",
         "assay": ["protein"]
+    },
+    "NTR:0001096": {
+        "name": "varACCESS",
+        "assay": ["reporter"]
+    },
+    "NTR:0000798": {
+        "name": "in vitro CRISPR screen using single-nucleus ATAC-seq",
+        "assay": ["CRISPR screens"]
     }
 }
 
@@ -655,5 +663,267 @@ ntr_biosamples = {
         "name": "TeloHAEC",
         "organs": ["heart"],
         "cells": ["endothelial cell"],
+    },
+    "NTR:000781": {
+        "name": "extraembryonic endoderm visceral"
+    },
+    "NTR:0000790": {
+        "name": "T778"
+    },
+    "NTR:0000791": {
+        "name": "GOT3"
+    },
+    "NTR:0000792": {
+        "name": "T1000"
+    },
+    "NTR:0000793": {
+        "name": "SKNO-1"
+    },
+    "NTR:0000794": {
+        "name": "UCSD-AML1"
+    },
+    "NTR:00001098": {
+        "name": "RVR SNRPN-2A-GFP, maternal allele tagged"
+    },
+    "NTR:00001099": {
+        "name": "RVR SNRPN-2A-GFP, paternal allele tagged"
+    },
+    "NTR:00001100": {
+        "name": "MGH2069 PWS type II paternal allele deletion"
+    },
+    "NTR:0001102": {
+        "name": "anterior left cardiac atrium",
+        "organs": ["heart"],
+        "developmental": ["mesoderm"],
+        "systems": ["circulatory system"]
+    },
+    "NTR:0001103": {
+        "name": "posterior left cardiac atrium",
+        "organs": ["heart"],
+        "developmental": ["mesoderm"],
+        "systems": ["circulatory system"]
+    },
+    "NTR:0001104": {
+        "name": "superior descending thoracic aorta",
+        "organs": ["arterial blood vessel", "blood vessel", "vasculature"],
+        "developmental": ["mesoderm"],
+        "systems": ["circulatory system"]
+    },
+    "NTR:0001105": {
+        "name": "inferior descending thoracic aorta",
+        "organs": ["arterial blood vessel", "blood vessel", "vasculature"],
+        "developmental": ["mesoderm"],
+        "systems": ["circulatory system"]
+    },
+    "NTR:0001106": {
+        "name": "superior left pulmonary vein",
+        "organs": ["blood vessel"],
+    },
+    "NTR:0001107": {
+        "name": "inferior left pulmonary vein",
+        "organs": ["blood vessel"],
+    },
+    "NTR:0001108": {
+        "name": "epiploic adipose tissue",
+        "organs": ["adipose tissue", "connective tissue"],
+        "developmental": ["mesoderm"]
+    },
+    "NTR:00001109": {
+        "name": "MGH2069"
+    },
+    "NTR:0001120": {
+        "name": "TM-87"
+    },
+    "NTR:0001121": {
+        "name": "SNU-1079"
+    },
+    "NTR:0001122": {
+        "name": "SNU-213"
+    },
+    "NTR:0001123": {
+        "name": "SNU-245"
+    },
+    "NTR:0001124": {
+        "name": "EWS502"
+    },
+    "NTR:0001125": {
+        "name": "SNU-840"
+    },
+    "NTR:0001126": {
+        "name": "SNU-466"
+    },
+    "NTR:0001127": {
+        "name": "SNU-1077"
+    },
+    "NTR:0001128": {
+        "name": "KMRC-3"
+    },
+    "NTR:0001129": {
+        "name": "SNU-886"
+    },
+    "NTR:0001130": {
+        "name": "K029AX"
+    },
+    "NTR:0001131": {
+        "name": "SNU-685"
+    },
+    "NTR:0001132": {
+        "name": "K029AX"
+    },
+    "NTR:0001133": {
+        "name": "UO-31"
+    },
+    "NTR:0001134": {
+        "name": "KNS-60"
+    },
+    "NTR:0001135": {
+        "name": "CJM"
+    },
+    "NTR:0001136": {
+        "name": "SNU-1196"
+    },
+    "NTR:0001137": {
+        "name": "BICR 16"
+    },
+    "NTR:0001138": {
+        "name": "SNU-410"
+    },
+    "NTR:0001139": {
+        "name": "SNU-61"
+    },
+    "NTR:0001140": {
+        "name": "SNU-761"
+    },
+    "NTR:0001141": {
+        "name": "Hey-A8"
+    },
+    "NTR:0001142": {
+        "name": "SNU-489"
+    },
+    "NTR:0001143": {
+        "name": "SNU-1076"
+    },
+    "NTR:0001144": {
+        "name": "SNU-1041"
+    },
+    "NTR:0001145": {
+        "name": "YD-8"
+    },
+    "NTR:0001146": {
+        "name": "SNU-1066"
+    },
+    "NTR:0001147": {
+        "name": "SNU-1214"
+    },
+    "NTR:0001148": {
+        "name": "U-BLC1"
+    },
+    "NTR:0001149": {
+        "name": "YD-38"
+    },
+    "NTR:0001150": {
+        "name": "SH-10-TC"
+    },
+    "NTR:0001151": {
+        "name": "WM983B"
+    },
+    "NTR:0001152": {
+        "name": "BICR 56"
+    },
+    "NTR:0001153": {
+        "name": "RERF-LC-Ad2"
+    },
+    "NTR:0001154": {
+        "name": "SNU-738"
+    },
+    "NTR:0001155": {
+        "name": "YD-15"
+    },
+    "NTR:0001156": {
+        "name": "KMBC-2"
+    },
+    "NTR:0001157": {
+        "name": "HCC-1438"
+    },
+    "NTR:0001158": {
+        "name": "WM88"
+    },
+    "NTR:0001159": {
+        "name": "HEC-265"
+    },
+    "NTR:0001160": {
+        "name": "HEC-151"
+    },
+    "NTR:0001161": {
+        "name": "HEC-6"
+    },
+    "NTR:0001162": {
+        "name": "SNU-81"
+    },
+    "NTR:0001163": {
+        "name": "HEC-59"
+    },
+    "NTR:0001164": {
+        "name": "HEC-251"
+    },
+    "NTR:0001165": {
+        "name": "MON"
+    },
+    "NTR:0001166": {
+        "name": "SNU-1105"
+    },
+    "NTR:0001167": {
+        "name": "SNU-46"
+    },
+    "NTR:0001168": {
+        "name": "WM1799"
+    },
+    "NTR:0001169": {
+        "name": "YD-10B"
+    },
+    "NTR:0001170": {
+        "name": "PE/CA-PJ49"
+    },
+    "NTR:0001171": {
+        "name": "SNU-869"
+    },
+    "NTR:0001172": {
+        "name": "L3.3"
+    },
+    "NTR:0001173": {
+        "name": "SNU-407"
+    },
+    "NTR:0001174": {
+        "name": "SNU-308"
+    },
+    "NTR:0001175": {
+        "name": "XM001"
+    },
+    "NTR:0001176": {
+        "name": "253J"
+    },
+    "NTR:0001177": {
+        "name": "KNS-81"
+    },
+    "NTR:0001178": {
+        "name": "ONCO-DG-1"
+    },
+    "NTR:0001179": {
+        "name": "TTC-709"
+    },
+    "NTR:0001180": {
+        "name": "HCC2108"
+    }
+}
+
+ntr_phenotypes = {
+    "NTR:0001118": {
+        "name": "LDL-C uptake"
+    }
+}
+
+ntr_platforms = {
+    "NTR:00001097": {
+        "name": "Illumina (Plasmidsaurus)"
     }
 }
