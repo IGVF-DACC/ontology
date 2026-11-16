@@ -24,6 +24,7 @@ Modes:
 Examples:
   python -m ontology.download_ontology_metadata
   python -m ontology.download_ontology_metadata --dry-run
+  python -m ontology.download_ontology_metadata --ontology xco,bao
   python -m ontology.download_ontology_metadata -o ontology_files_metadata.json
 """
 
@@ -306,6 +307,19 @@ def build_file_metadata(release_info: dict, submitted_file_name: str) -> dict:
     }
 
 
+def expand_ontology_keys(ontology_arg: str | None) -> list[str]:
+    """Expand a comma-separated --ontology value into ontology keys."""
+    if not ontology_arg:
+        return list(ONTOLOGY_ASSET_DICT.keys())
+
+    keys = []
+    for part in ontology_arg.split(','):
+        key = part.strip()
+        if key:
+            keys.append(key)
+    return keys
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         description='Download latest ontology files and write metadata JSON.',
@@ -313,6 +327,7 @@ def parse_args(argv=None):
         epilog="""Examples:
   %(prog)s
   %(prog)s --dry-run
+  %(prog)s --ontology xco,bao
   %(prog)s -o ontology_files_metadata.json""",
     )
     parser.add_argument(
@@ -328,17 +343,15 @@ def parse_args(argv=None):
     )
     parser.add_argument(
         '--ontology',
-        action='append',
-        dest='ontologies',
         default=None,
-        help='Limit to one ontology key (repeatable), e.g. --ontology cl --ontology go.',
+        help='Limit to ontology key(s), comma-separated, e.g. --ontology xco,bao.',
     )
     return parser.parse_args(argv)
 
 
 def main(argv=None):
     args = parse_args(argv)
-    ontology_keys = args.ontologies or list(ONTOLOGY_ASSET_DICT.keys())
+    ontology_keys = expand_ontology_keys(args.ontology)
 
     unknown = [k for k in ontology_keys if k not in ONTOLOGY_ASSET_DICT]
     if unknown:
