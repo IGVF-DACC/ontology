@@ -31,6 +31,7 @@ Used in `generate_ontology` (combined JSON)
 | pcl | pcl.owl | [http://purl.obolibrary.org/obo/pcl.owl](http://purl.obolibrary.org/obo/pcl.owl) | IGVFDS4687SYMS |
 | go | go.owl | [https://purl.obolibrary.org/obo/go.owl](https://purl.obolibrary.org/obo/go.owl) | IGVFDS9239KXAX |
 | bao | bao_complete.owl | [https://www.bioassayontology.org/bao/bao_complete.owl](https://www.bioassayontology.org/bao/bao_complete.owl) | IGVFDS4680UUQJ |
+| xco | xco.owl | [http://purl.obolibrary.org/obo/xco.owl](http://purl.obolibrary.org/obo/xco.owl) | IGVFDS9871AXMU |
 
 Catalog-only (download/metadata; not used in generation)
 ----------------
@@ -60,7 +61,7 @@ Use this when refreshing source files for IGVF portal upload (curated sets).
 ```bash
 python -m ontology.download_ontology_metadata
 python -m ontology.download_ontology_metadata --dry-run
-python -m ontology.download_ontology_metadata --ontology bao --ontology go
+python -m ontology.download_ontology_metadata --ontology xco,bao
 python -m ontology.download_ontology_metadata -o ontology_files_metadata.json
 ```
 
@@ -146,6 +147,7 @@ Resources
 * [PCL](https://obofoundry.org/ontology/pcl.html) — [PURL](http://purl.obolibrary.org/obo/pcl.owl)
 * [GO](https://geneontology.org/) — [PURL](https://purl.obolibrary.org/obo/go.owl)
 * [BAO](http://bioassayontology.org) — [bao_complete.owl](https://www.bioassayontology.org/bao/bao_complete.owl) (download mirror: [GitHub](https://raw.githubusercontent.com/BioAssayOntology/BAO/master/bao_complete.owl)) — [OLS API](https://www.ebi.ac.uk/ols4/api/ontologies/bao)
+* [XCO](https://obofoundry.org/ontology/xco.html) — [PURL](http://purl.obolibrary.org/obo/xco.owl) — [OLS API](https://www.ebi.ac.uk/ols4/api/ontologies/xco)
 * [ChEBI](https://www.ebi.ac.uk/chebi/) — [PURL](http://purl.obolibrary.org/obo/chebi.owl) (download: [chebi.owl.gz](http://purl.obolibrary.org/obo/chebi.owl.gz))
 * [VariO](https://variationontology.org/) — [PURL](http://purl.obolibrary.org/obo/vario.owl)
 * [Orphanet / ORDO](https://www.orphadata.com/) — [ordo_orphanet.owl](https://www.orphadata.com/data/ontologies/ordo/last_version/ordo_orphanet.owl)

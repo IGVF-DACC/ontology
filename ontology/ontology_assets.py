@@ -108,6 +108,13 @@ ONTOLOGY_ASSET_DICT = {
         'ols_id': 'bao',
         'file_set': 'IGVFDS4680UUQJ',
     },
+    'xco': {
+        # Experimental Condition Ontology (RGD). PURL redirects to RGD download.
+        'local_file_name': 'xco.owl',
+        'uri': 'http://purl.obolibrary.org/obo/xco.owl',
+        'ols_id': 'xco',
+        'file_set': 'IGVFDS9871AXMU',
+    },
     'chebi': {
         # Full OWL ~826MB; download official .owl.gz (~66MB) instead.
         'local_file_name': 'chebi.owl',
@@ -167,6 +174,7 @@ METADATA_AUTHORITY = {
     'PCL': 'pcl',
     'GO': 'go',
     'BAO': 'bao',
+    'XCO': 'xco',
 }
 
 
