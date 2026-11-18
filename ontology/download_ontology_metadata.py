@@ -5,7 +5,8 @@ Uses shared source config from ontology.ontology_assets.
 
 Download:
   Use ONTOLOGY_ASSET_DICT download_uri when set, else uri.
-  ChEBI download_uri is the official .owl.gz; OWL/OBO files are
+  ChEBI download_uri is the official .owl.gz; VariO download_uri is the
+  RDF/XML release OLS loads. OWL/OBO files are
   gzipped locally. JSON files (OncoTree) are packaged as .tar.gz.
   Metadata submitted_file_name points at the compressed archive.
   Metadata source_url always uses uri.
@@ -63,7 +64,7 @@ def get_release_info(owl_file_name: str) -> dict:
     How release info is obtained:
     1. source_url: ONTOLOGY_ASSET_DICT uri
        download_url: optional download_uri, else uri
-       (BAO: GitHub mirror; ChEBI: official .owl.gz).
+       (BAO: GitHub mirror; ChEBI: official .owl.gz; VariO: RDF/XML release).
     2. version:
        - cellosaurus: GET https://api.cellosaurus.org/release-info
        - oncotree: GET https://oncotree.mskcc.org/api/versions

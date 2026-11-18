@@ -39,7 +39,7 @@ Catalog-only (download/metadata; not used in generation)
 | Key | File | Source URI | Curated set |
 | ----- | ------ | ------------ | ------------- |
 | chebi | chebi.owl | [http://purl.obolibrary.org/obo/chebi.owl](http://purl.obolibrary.org/obo/chebi.owl) | IGVFDS0762GKJU |
-| vario | vario.owl | [http://purl.obolibrary.org/obo/vario.owl](http://purl.obolibrary.org/obo/vario.owl) | IGVFDS3622SSGR |
+| vario | vario.owl | [https://variationontology.org/vario_download/VariO109.xml](https://variationontology.org/vario_download/VariO109.xml) | IGVFDS3622SSGR |
 | orphanet | ordo_orphanet.owl | [https://www.orphadata.com/data/ontologies/ordo/last_version/ordo_orphanet.owl](https://www.orphadata.com/data/ontologies/ordo/last_version/ordo_orphanet.owl) | IGVFDS9088SLTK |
 | cellosaurus | cellosaurus.obo | [https://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo](https://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo) | IGVFDS3922HDSH |
 | oncotree | oncotree.json | [https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_latest_stable](https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_latest_stable) | IGVFDS0171BVBY |
@@ -67,7 +67,7 @@ python -m ontology.download_ontology_metadata -o ontology_files_metadata.json
 
 Behavior:
 
-* Downloads each asset’s `uri` (or `download_uri` when set: BAO GitHub mirror, ChEBI `.owl.gz`). OWL/OBO downloads are gzipped locally for portal upload; JSON files (OncoTree) are packaged as `.tar.gz`.
+* Downloads each asset’s `uri` (or `download_uri` when set: BAO GitHub mirror, ChEBI `.owl.gz`, VariO RDF/XML). OWL/OBO downloads are gzipped locally for portal upload; JSON files (OncoTree) are packaged as `.tar.gz`.
 * Writes `ontology_files_metadata-YYYY-MM-DD.json` with per-file portal fields (`content_type`, `file_format`, `award`, `lab`, `file_set`, `source_url`, `version`, `controlled_access`, `submitted_file_name`).
 * Version resolution order:
   1. Cellosaurus: [https://api.cellosaurus.org/release-info](https://api.cellosaurus.org/release-info)
@@ -149,7 +149,7 @@ Resources
 * [BAO](http://bioassayontology.org) — [bao_complete.owl](https://www.bioassayontology.org/bao/bao_complete.owl) (download mirror: [GitHub](https://raw.githubusercontent.com/BioAssayOntology/BAO/master/bao_complete.owl)) — [OLS API](https://www.ebi.ac.uk/ols4/api/ontologies/bao)
 * [XCO](https://obofoundry.org/ontology/xco.html) — [PURL](http://purl.obolibrary.org/obo/xco.owl) — [OLS API](https://www.ebi.ac.uk/ols4/api/ontologies/xco)
 * [ChEBI](https://www.ebi.ac.uk/chebi/) — [PURL](http://purl.obolibrary.org/obo/chebi.owl) (download: [chebi.owl.gz](http://purl.obolibrary.org/obo/chebi.owl.gz))
-* [VariO](https://variationontology.org/) — [PURL](http://purl.obolibrary.org/obo/vario.owl)
+* [VariO](https://variationontology.org/) — [VariO109.xml](https://variationontology.org/vario_download/VariO109.xml) (the RDF/XML file OLS loads; the OBO PURL serves an older functional-syntax file)
 * [Orphanet / ORDO](https://www.orphadata.com/) — [ordo_orphanet.owl](https://www.orphadata.com/data/ontologies/ordo/last_version/ordo_orphanet.owl)
 * [Cellosaurus](https://www.cellosaurus.org/) — [OBO](https://ftp.expasy.org/databases/cellosaurus/cellosaurus.obo) — [release-info API](https://api.cellosaurus.org/release-info)
 * [OncoTree](https://oncotree.mskcc.org/) — [tumorTypes JSON](https://oncotree.mskcc.org/api/tumorTypes?version=oncotree_latest_stable) — [versions API](https://oncotree.mskcc.org/api/versions)

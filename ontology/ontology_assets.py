@@ -125,8 +125,11 @@ ONTOLOGY_ASSET_DICT = {
         'catalog_only': True,
     },
     'vario': {
+        # OLS loads this RDF/XML release. The OBO PURL serves an older
+        # functional-syntax file, which is not the file OLS uses.
         'local_file_name': 'vario.owl',
-        'uri': 'http://purl.obolibrary.org/obo/vario.owl',
+        'uri': 'https://variationontology.org/vario_download/VariO109.xml',
+        'download_uri': 'https://variationontology.org/vario_download/VariO109.xml',
         'ols_id': 'vario',
         'file_set': 'IGVFDS3622SSGR',
         'catalog_only': True,
